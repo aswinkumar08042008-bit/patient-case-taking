@@ -141,6 +141,11 @@ submittedDesc:
   "Your health information has been collected and organized into a structured case summary.",
 
 backToHome: "Back to Home",
+chatDescription: "I'm here to understand your health concern.",
+typeAnswer: "Type your answer...",
+voiceInput: "Voice input",
+casePrivacyNote:
+  "Your responses will be used only to prepare your medical case summary.",
   },
 
   "தமிழ்": {
@@ -262,6 +267,11 @@ submittedDesc:
   "உங்கள் உடல்நல தகவல்கள் சேகரிக்கப்பட்டு ஒரு கட்டமைக்கப்பட்ட வழக்கு சுருக்கமாக ஒழுங்குபடுத்தப்பட்டுள்ளன.",
 
 backToHome: "முகப்புப் பக்கத்திற்கு திரும்பவும்",
+chatDescription: "உங்கள் உடல்நல பிரச்சனையைப் புரிந்துகொள்ள நான் இங்கே இருக்கிறேன்.",
+typeAnswer: "உங்கள் பதிலை உள்ளிடவும்...",
+voiceInput: "குரல் உள்ளீடு",
+casePrivacyNote:
+  "உங்கள் பதில்கள் உங்கள் மருத்துவ வழக்கு சுருக்கத்தைத் தயாரிக்க மட்டுமே பயன்படுத்தப்படும்.",
   },
 
   "हिन्दी": {
@@ -383,6 +393,11 @@ submittedDesc:
   "आपकी स्वास्थ्य जानकारी एकत्र करके एक संरचित केस सारांश में व्यवस्थित की गई है।",
 
 backToHome: "होम पर वापस जाएं",
+chatDescription: "मैं आपकी स्वास्थ्य समस्या को समझने में आपकी सहायता करने के लिए यहां हूं।",
+typeAnswer: "अपना उत्तर दर्ज करें...",
+voiceInput: "आवाज़ इनपुट",
+casePrivacyNote:
+  "आपके उत्तरों का उपयोग केवल आपके चिकित्सा केस सारांश को तैयार करने के लिए किया जाएगा।",
   },
 
   "മലയാളം": {
@@ -504,6 +519,11 @@ submittedDesc:
   "നിങ്ങളുടെ ആരോഗ്യ വിവരങ്ങൾ ശേഖരിച്ച് ഒരു ക്രമീകരിച്ച കേസ് സംഗ്രഹമായി തയ്യാറാക്കിയിരിക്കുന്നു.",
 
 backToHome: "ഹോം പേജിലേക്ക് മടങ്ങുക",
+chatDescription: "നിങ്ങളുടെ ആരോഗ്യ പ്രശ്നം മനസ്സിലാക്കാൻ ഞാൻ ഇവിടെ ഉണ്ട്.",
+typeAnswer: "നിങ്ങളുടെ ഉത്തരം നൽകുക...",
+voiceInput: "വോയ്സ് ഇൻപുട്ട്",
+casePrivacyNote:
+  "നിങ്ങളുടെ മെഡിക്കൽ കേസ് സംഗ്രഹം തയ്യാറാക്കാൻ മാത്രമേ നിങ്ങളുടെ ഉത്തരങ്ങൾ ഉപയോഗിക്കൂ.",
   },
 };
 
@@ -665,7 +685,7 @@ if (page === "case-taking") {
 
           <div>
             <h2>MediVoice AI</h2>
-            <p>I'm here to understand your health concern.</p>
+            <p>{t.chatDescription}</p>
           </div>
         </div>
 
@@ -702,7 +722,7 @@ if (page === "case-taking") {
         <div className="chat-input-area">
           <input
             type="text"
-            placeholder="Type your answer..."
+            placeholder={t.typeAnswer}
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
             onKeyDown={(e) => {
@@ -725,9 +745,9 @@ if (page === "case-taking") {
           </button>
         </div>
 
-        <p className="chat-note">
-          Your responses will be used only to prepare your medical case summary.
-        </p>
+       <p className="chat-note">
+  {t.casePrivacyNote}
+</p>
       </main>
     </div>
   );
