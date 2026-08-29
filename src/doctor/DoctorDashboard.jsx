@@ -1,8 +1,10 @@
-import { useState } from "react";
-import { Search, Bell, Users, ClipboardList, CheckCircle, ArrowLeft } from "lucide-react";import "./DoctorDashboard.css";
 
+import { useState } from "react";
+import { Search, Bell, Users, ClipboardList, CheckCircle, ArrowLeft } from "lucide-react";
+import "./DoctorDashboard.css";
 function DoctorDashboard() {
   const [selectedPatient, setSelectedPatient] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const patients = [
     {
       id: "P001",
@@ -26,6 +28,11 @@ function DoctorDashboard() {
       status: "New",
     },
   ];
+  const filteredPatients = patients.filter((patient) =>
+  patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  patient.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  patient.complaint.toLowerCase().includes(searchTerm.toLowerCase())
+);
 if (selectedPatient) {
   return (
     <div className="doctor-dashboard">
@@ -135,9 +142,11 @@ if (selectedPatient) {
           <div className="search-box">
             <Search size={19} />
             <input
-              type="text"
-              placeholder="Search patient..."
-            />
+  type="text"
+  placeholder="Search patient..."
+  value={searchTerm}
+  onChange={(e) => setSearchTerm(e.target.value)}
+/>
           </div>
         </div>
 
@@ -150,8 +159,7 @@ if (selectedPatient) {
             <span>Action</span>
           </div>
 
-          {patients.map((patient) => (
-            <div className="patient-row" key={patient.id}>
+{filteredPatients.map((patient) => (            <div className="patient-row" key={patient.id}>
               <div>
                 <strong>{patient.name}</strong>
                 <small>{patient.id}</small>
