@@ -1,6 +1,5 @@
 
 import { useState } from "react";
-import { useState } from "react";
 import {
   Search,
   Bell,
@@ -12,7 +11,6 @@ import {
 import "./DoctorDashboard.css";
 function DoctorDashboard() {
   const [selectedPatient, setSelectedPatient] = useState(null);
-  const [searchTerm, setSearchTerm] = useState("");
   const patients = [
     {
       id: "P001",
