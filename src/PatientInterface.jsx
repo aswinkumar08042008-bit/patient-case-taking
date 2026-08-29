@@ -1532,8 +1532,4 @@ if (page === "submitted") {
   );
 }
 }
-
-
-
-
 export default PatientInterface;
