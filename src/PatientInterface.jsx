@@ -20,7 +20,7 @@ function PatientInterface() {
 
   const [page, setPage] = useState("welcome");
   const [selectedLanguage, setSelectedLanguage] = useState("");
-  
+  const [agreed, setAgreed] = useState(false);
   const [patientDetails, setPatientDetails] = useState({
   fullName: "",
   age: "",
@@ -1222,17 +1222,22 @@ if (page === "consent") {
           </div>
 
           <label className="consent-checkbox">
-            <input type="checkbox" />
+            <input
+  type="checkbox"
+  checked={agreed}
+  onChange={(e) => setAgreed(e.target.checked)}
+/>
             <span>
               I understand and agree to the collection and processing
               of my information for this assessment.
             </span>
           </label>
 
-          <button
-            className="continue-btn consent-continue"
-            onClick={() => setPage("case-taking")}
-          >
+         <button
+  className="continue-btn consent-continue"
+  disabled={!agreed}
+  onClick={() => setPage("case-taking")}
+>
            {t.agreeContinue}
             <ArrowRight size={20} />
           </button>
