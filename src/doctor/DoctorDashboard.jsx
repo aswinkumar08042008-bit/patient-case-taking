@@ -1,7 +1,8 @@
-import { Search, Bell, Users, ClipboardList, CheckCircle } from "lucide-react";
-import "./DoctorDashboard.css";
+import { useState } from "react";
+import { Search, Bell, Users, ClipboardList, CheckCircle, ArrowLeft } from "lucide-react";import "./DoctorDashboard.css";
 
 function DoctorDashboard() {
+  const [selectedPatient, setSelectedPatient] = useState(null);
   const patients = [
     {
       id: "P001",
@@ -25,7 +26,55 @@ function DoctorDashboard() {
       status: "New",
     },
   ];
+if (selectedPatient) {
+  return (
+    <div className="doctor-dashboard">
+      <button
+        className="back-btn"
+        onClick={() => setSelectedPatient(null)}
+      >
+        <ArrowLeft size={18} />
+        Back to Dashboard
+      </button>
 
+      <div className="patient-case-header">
+        <h1>{selectedPatient.name}</h1>
+        <p>
+          Patient ID: {selectedPatient.id} | Age: {selectedPatient.age}
+        </p>
+      </div>
+
+      <div className="case-card">
+        <h2>Chief Complaint</h2>
+        <p>{selectedPatient.complaint}</p>
+      </div>
+
+      <div className="case-card">
+        <h2>AI Case Summary</h2>
+        <p>
+          The patient's information collected during the AI
+          case-taking process will appear here.
+        </p>
+      </div>
+
+      <div className="case-card">
+        <h2>Medical History</h2>
+        <p>
+          Previous medical conditions, medicines, allergies and
+          surgeries will appear here.
+        </p>
+      </div>
+
+      <div className="case-card">
+        <h2>Medical Documents</h2>
+        <p>
+          Uploaded prescriptions, lab reports and other documents
+          will appear here.
+        </p>
+      </div>
+    </div>
+  );
+}
   return (
     <div className="doctor-dashboard">
       <header className="doctor-header">
@@ -120,9 +169,12 @@ function DoctorDashboard() {
                 {patient.status}
               </span>
 
-              <button className="view-btn">
-                View Case
-              </button>
+             <button
+  className="view-btn"
+  onClick={() => setSelectedPatient(patient)}
+>
+  View Case
+</button>
             </div>
           ))}
         </div>
