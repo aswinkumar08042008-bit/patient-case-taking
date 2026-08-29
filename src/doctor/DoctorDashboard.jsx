@@ -179,7 +179,7 @@ if (selectedPatient) {
 
              <button
   className="view-btn"
-  onClick={() => setSelectedPatient(patient)}
+  onClick={() => alert(`Opening case for ${patient.name}`)}
 >
   View Case
 </button>
