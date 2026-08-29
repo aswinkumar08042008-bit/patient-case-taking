@@ -1,6 +1,14 @@
 
 import { useState } from "react";
-import { Search, Bell, Users, ClipboardList, CheckCircle, ArrowLeft } from "lucide-react";
+import { useState } from "react";
+import {
+  Search,
+  Bell,
+  Users,
+  ClipboardList,
+  CheckCircle,
+  ArrowLeft,
+} from "lucide-react";
 import "./DoctorDashboard.css";
 function DoctorDashboard() {
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -179,8 +187,7 @@ if (selectedPatient) {
 
              <button
   className="view-btn"
-  onClick={() => setSelectedPatient(patient)}
->
+  onClick={() => alert(`Opening case for ${patient.name}`)}>
   View Case
 </button>
             </div>
@@ -190,5 +197,56 @@ if (selectedPatient) {
     </div>
   );
 }
+  if (selectedPatient) {
+    return (
+      <div className="doctor-dashboard">
 
+        <button
+          className="back-btn"
+          onClick={() => setSelectedPatient(null)}
+        >
+          <ArrowLeft size={20} />
+          Back to Dashboard
+        </button>
+
+        <div className="patient-case-header">
+          <h1>{selectedPatient.name}</h1>
+          <p>
+            Patient ID: {selectedPatient.id} &nbsp; | &nbsp;
+            Age: {selectedPatient.age}
+          </p>
+        </div>
+
+        <div className="case-card">
+          <h2>Chief Complaint</h2>
+          <p>{selectedPatient.complaint}</p>
+        </div>
+
+        <div className="case-card">
+          <h2>Current Health Concern</h2>
+          <p>
+            Patient information collected through the MediVoice
+            AI case-taking process will appear here.
+          </p>
+        </div>
+
+        <div className="case-card">
+          <h2>Medical History</h2>
+          <p>
+            Previous medical conditions, medicines, allergies
+            and surgeries will appear here.
+          </p>
+        </div>
+
+        <div className="case-card">
+          <h2>Medical Documents</h2>
+          <p>
+            Uploaded prescriptions, lab reports and other
+            medical documents will appear here.
+          </p>
+        </div>
+
+      </div>
+    );
+  }
 export default DoctorDashboard;
