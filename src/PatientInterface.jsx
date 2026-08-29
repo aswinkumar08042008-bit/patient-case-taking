@@ -20,12 +20,14 @@ function PatientInterface() {
 
   const [page, setPage] = useState("welcome");
   const [selectedLanguage, setSelectedLanguage] = useState("");
+  
   const [patientDetails, setPatientDetails] = useState({
   fullName: "",
   age: "",
   gender: "",
   phoneNumber: "",
 });
+
   const [messages, setMessages] = useState([]);
   const [documents, setDocuments] = useState({
   prescription: null,
@@ -1336,6 +1338,31 @@ if (page === "review") {
 <p className="review-description">
   {t.reviewDesc}
 </p>
+<div className="summary-section">
+  <h2>👤 {t.patientDetails}</h2>
+
+  <div className="summary-content">
+    <p>
+      <strong>{t.fullName}:</strong>{" "}
+      {patientDetails.fullName || "Not provided"}
+    </p>
+
+    <p>
+      <strong>{t.age}:</strong>{" "}
+      {patientDetails.age || "Not provided"}
+    </p>
+
+    <p>
+      <strong>{t.gender}:</strong>{" "}
+      {patientDetails.gender || "Not provided"}
+    </p>
+
+    <p>
+      <strong>{t.phoneNumber}:</strong>{" "}
+      {patientDetails.phoneNumber || "Not provided"}
+    </p>
+  </div>
+</div>
 
           <div className="summary-section">
   <h2>{t.currentHealthConcern}</h2>
