@@ -20,6 +20,12 @@ function PatientInterface() {
 
   const [page, setPage] = useState("welcome");
   const [selectedLanguage, setSelectedLanguage] = useState("");
+  const [patientDetails, setPatientDetails] = useState({
+  fullName: "",
+  age: "",
+  gender: "",
+  phoneNumber: "",
+});
   const [messages, setMessages] = useState([]);
   const [documents, setDocuments] = useState({
   prescription: null,
@@ -1069,38 +1075,67 @@ if (page === "details") {
 
           <div className="form-group">
             <label>{t.fullName}</label>
-            <input
-              type="text"
-              placeholder={t.enterFullName}
-            />
+           <input
+  type="text"
+  placeholder={t.enterFullName}
+  value={patientDetails.fullName}
+  onChange={(e) =>
+    setPatientDetails({
+      ...patientDetails,
+      fullName: e.target.value,
+    })
+  }
+/>
           </div>
 
           <div className="form-row">
             <div className="form-group">
               <label>{t.age}</label>
               <input
-                type="number"
-                placeholder={t.enterAge}
-              />
+  type="number"
+  placeholder={t.enterAge}
+  value={patientDetails.age}
+  onChange={(e) =>
+    setPatientDetails({
+      ...patientDetails,
+      age: e.target.value,
+    })
+  }
+/>
             </div>
 
             <div className="form-group">
               <label>{t.gender}</label>
-              <select>
-                <option value="">{t.selectGender}</option>
-                <option>{t.male}</option>
-                <option>{t.female}</option>
-                <option>{t.preferNotToSay}</option>
-              </select>
+              <select
+  value={patientDetails.gender}
+  onChange={(e) =>
+    setPatientDetails({
+      ...patientDetails,
+      gender: e.target.value,
+    })
+  }
+>
+  <option value="">{t.selectGender}</option>
+  <option>{t.male}</option>
+  <option>{t.female}</option>
+  <option>{t.preferNotToSay}</option>
+</select>
             </div>
           </div>
 
           <div className="form-group">
             <label>{t.phoneNumber}</label>
-            <input
-              type="tel"
-              placeholder={t.enterPhone}
-            />
+           <input
+  type="tel"
+  placeholder={t.enterPhone}
+  value={patientDetails.phoneNumber}
+  onChange={(e) =>
+    setPatientDetails({
+      ...patientDetails,
+      phoneNumber: e.target.value,
+    })
+  }
+/>
           </div>
 
           <button
@@ -1345,7 +1380,46 @@ if (page === "review") {
     </p>
   </div>
 </div>
+<div className="summary-section">
+  <h2>📄 {t.medicalDocuments}</h2>
 
+  <div className="summary-content">
+    {documents.prescription && (
+      <p>
+        📋 <strong>{t.prescription}:</strong>{" "}
+        {documents.prescription.name}
+      </p>
+    )}
+
+    {documents.labReports && (
+      <p>
+        🧪 <strong>{t.labReports}:</strong>{" "}
+        {documents.labReports.name}
+      </p>
+    )}
+
+    {documents.dischargeSummary && (
+      <p>
+        🏥 <strong>{t.dischargeSummary}:</strong>{" "}
+        {documents.dischargeSummary.name}
+      </p>
+    )}
+
+    {documents.otherDocuments && (
+      <p>
+        📎 <strong>{t.otherDocuments}:</strong>{" "}
+        {documents.otherDocuments.name}
+      </p>
+    )}
+
+    {!documents.prescription &&
+      !documents.labReports &&
+      !documents.dischargeSummary &&
+      !documents.otherDocuments && (
+        <p>{t.uploadSkipText}</p>
+      )}
+  </div>
+</div>
           <div className="review-note">
             <ShieldCheck size={20} />
             <p>{t.reviewNote}</p>
