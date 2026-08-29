@@ -990,10 +990,7 @@ if (page === "details") {
 
           <h1>{t.patientDetails}</h1>
 
-          <p>
-            Please provide your basic details before starting
-            your health assessment.
-          </p>
+          <p>{t.patientDetailsDesc}</p>
 
           <div className="form-group">
             <label>{t.fullName}</label>
@@ -1032,12 +1029,12 @@ if (page === "details") {
           </div>
 
           <button
-            className="continue-btn details-continue"
-            onClick={() => setPage("consent")}
-          >
-            Continue
-            <ArrowRight size={20} />
-          </button>
+  className="continue-btn details-continue"
+  onClick={() => setPage("consent")}
+>
+  {t.continue}
+  <ArrowRight size={20} />
+</button>
         </div>
       </main>
     </div>
