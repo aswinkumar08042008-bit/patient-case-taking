@@ -1264,7 +1264,6 @@ if (page === "review") {
         <div className="review-card">
           <div className="details-icon">🩺</div>
 
-          <h1>Review Your Health Information</h1>
 
           <h1>{t.reviewTitle}</h1>
 
@@ -1273,31 +1272,48 @@ if (page === "review") {
 </p>
 
           <div className="summary-section">
-            <h2> {t.currentHealthConcern}</h2>
+  <h2>{t.currentHealthConcern}</h2>
 
+  <div className="summary-content">
+    {messages
+      .filter((message) => message.sender === "user")
+      .map((message, index) => (
+        <p key={index}>
+          <strong>{index + 1}.</strong> {message.text}
+        </p>
+      ))}
 
-            <div className="summary-content">
-              <p>{t.healthConcernText}</p>
-            </div>
-          </div>
+   
+  </div>
+</div>
 
           <div className="summary-section">
             <h2>📋 {t.reviewMedicalHistory}</h2>
 
 
-            <div className="summary-content">
-              <p>{t.medicalHistoryReviewText}</p>
-            </div>
-          </div>
+            
+  <div className="summary-content">
+    <p>
+      <strong>{t.previousConditions}:</strong>{" "}
+      {previousConditions || "Not provided"}
+    </p>
 
-          <div className="summary-section">
-           <h2>📄 {t.medicalDocuments}</h2>
+    <p>
+      <strong>{t.currentMedicines}:</strong>{" "}
+      {currentMedicines || "Not provided"}
+    </p>
 
-            <div className="summary-content">
-              <p>{t.medicalDocumentsText}</p>
+    <p>
+      <strong>{t.allergies}:</strong>{" "}
+      {allergies || "Not provided"}
+    </p>
 
-            </div>
-          </div>
+    <p>
+      <strong>{t.previousSurgeries}:</strong>{" "}
+      {previousSurgeries || "Not provided"}
+    </p>
+  </div>
+</div>
 
           <div className="review-note">
             <ShieldCheck size={20} />
