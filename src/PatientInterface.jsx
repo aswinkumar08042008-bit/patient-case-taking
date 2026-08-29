@@ -21,7 +21,18 @@ function PatientInterface() {
   const [page, setPage] = useState("welcome");
   const [selectedLanguage, setSelectedLanguage] = useState("");
   const [messages, setMessages] = useState([]);
-
+  const [documents, setDocuments] = useState({
+  prescription: null,
+  labReports: null,
+  dischargeSummary: null,
+  otherDocuments: null,
+});
+const handleDocumentUpload = (type, file) => {
+  setDocuments((prev) => ({
+    ...prev,
+    [type]: file,
+  }));
+};
 const translations = {
   English: {
     getStarted: "Get Started",
@@ -869,7 +880,12 @@ if (page === "documents") {
              <h3>{t.prescription}</h3>
 <p>{t.prescriptionDesc}</p>
 
-              <input type="file" />
+             <input
+  type="file"
+  onChange={(e) =>
+    handleDocumentUpload("prescription", e.target.files[0])
+  }
+/>
             </div>
 
             <div className="upload-box">
@@ -877,7 +893,12 @@ if (page === "documents") {
               <h3>{t.labReports}</h3>
 <p>{t.labReportsDesc}</p>
 
-              <input type="file" />
+              <input
+  type="file"
+  onChange={(e) =>
+    handleDocumentUpload("labReports", e.target.files[0])
+  }
+/>
             </div>
 
             <div className="upload-box">
@@ -885,7 +906,12 @@ if (page === "documents") {
               <h3>{t.dischargeSummary}</h3>
 <p>{t.dischargeSummaryDesc}</p>
 
-              <input type="file" />
+             <input
+  type="file"
+  onChange={(e) =>
+    handleDocumentUpload("dischargeSummary", e.target.files[0])
+  }
+/>
             </div>
 
             <div className="upload-box">
@@ -893,7 +919,12 @@ if (page === "documents") {
               <h3>{t.otherDocuments}</h3>
 <p>{t.otherDocumentsDesc}</p>
 
-              <input type="file" />
+              <input
+  type="file"
+  onChange={(e) =>
+    handleDocumentUpload("otherDocuments", e.target.files[0])
+  }
+/>
             </div>
 
           </div>
