@@ -20,16 +20,7 @@ function PatientInterface() {
 
   const [page, setPage] = useState("welcome");
   const [selectedLanguage, setSelectedLanguage] = useState("");
-  const [messages, setMessages] = useState([
-  {
-    sender: "ai",
-    text: "Hello! I'm MediVoice, your AI health assistant.",
-  },
-  {
-    sender: "ai",
-    text: "What brings you to the hospital today?",
-  },
-]);
+  const [messages, setMessages] = useState([]);
 
 const translations = {
   English: {
@@ -517,7 +508,23 @@ backToHome: "ഹോം പേജിലേക്ക് മടങ്ങുക",
 };
 
 const t = translations[selectedLanguage] || translations.English;
+useEffect(() => {
+  if (selectedLanguage) {
+    setMessages([
+      {
+        sender: "ai",
+        text: t.aiGreeting,
+      },
+      {
+        sender: "ai",
+        text: t.firstQuestion,
+      },
+    ]);
 
+    setQuestionStep(0);
+    setCaseCompleted(false);
+  }
+}, [selectedLanguage]);
 const [answer, setAnswer] = useState("");
 const [isListening, setIsListening] = useState(false);
 const [questionStep, setQuestionStep] = useState(0);
@@ -1071,8 +1078,7 @@ if (page === "consent") {
           <h1>{t.privacyTitle}</h1>
 
           <p className="consent-description">
-            Before starting your health assessment, please review
-            and provide your consent.
+            {t.privacyDesc}
           </p>
 
           <div className="consent-points">
