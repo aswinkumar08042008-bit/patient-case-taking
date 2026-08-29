@@ -550,7 +550,10 @@ const [isListening, setIsListening] = useState(false);
 const [questionStep, setQuestionStep] = useState(0);
 const [caseCompleted, setCaseCompleted] = useState(false);
 const messagesEndRef = useRef(null);
-
+const [previousConditions, setPreviousConditions] = useState("");
+const [currentMedicines, setCurrentMedicines] = useState("");
+const [allergies, setAllergies] = useState("");
+const [previousSurgeries, setPreviousSurgeries] = useState("");
 useEffect(() => {
   messagesEndRef.current?.scrollIntoView({
     behavior: "smooth",
@@ -787,22 +790,36 @@ if (page === "medical-history") {
 
 <textarea
   placeholder={t.previousConditionsPlaceholder}
+  value={previousConditions}
+  onChange={(e) => setPreviousConditions(e.target.value)}
 />
           </div>
 
           <div className="form-group">
             <label>{t.currentMedicines}</label>
-<textarea placeholder={t.currentMedicinesPlaceholder} />
+<textarea
+  placeholder={t.currentMedicinesPlaceholder}
+  value={currentMedicines}
+  onChange={(e) => setCurrentMedicines(e.target.value)}
+/>
           </div>
 
           <div className="form-group">
             <label>{t.allergies}</label>
-<textarea placeholder={t.allergiesPlaceholder} />
+<textarea
+  placeholder={t.allergiesPlaceholder}
+  value={allergies}
+  onChange={(e) => setAllergies(e.target.value)}
+/>
           </div>
 
           <div className="form-group">
             <label>{t.previousSurgeries}</label>
-<textarea placeholder={t.surgeriesPlaceholder} />
+<textarea
+  placeholder={t.surgeriesPlaceholder}
+  value={previousSurgeries}
+  onChange={(e) => setPreviousSurgeries(e.target.value)}
+/>
           </div>
 
           <button
