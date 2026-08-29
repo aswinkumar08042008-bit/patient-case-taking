@@ -11,6 +11,7 @@ import {
 import "./DoctorDashboard.css";
 function DoctorDashboard() {
   const [selectedPatient, setSelectedPatient] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const patients = [
     {
       id: "P001",
