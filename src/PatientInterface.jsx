@@ -26,9 +26,11 @@ function PatientInterface() {
       phoneNumber: patientDetails.phoneNumber,
     });
 
-    console.log("Patient saved:", response.data);
+   console.log("Patient saved:", response.data);
 
-    setPage("consent");
+setPatientId(response.data.patient.id);
+
+setPage("consent");
   } catch (error) {
     console.error("Failed to save patient:", error);
     alert("Could not connect to the backend.");
@@ -53,7 +55,7 @@ useEffect(() => {
   gender: "",
   phoneNumber: "",
 });
-
+const [patientId, setPatientId] = useState(null);
   const [messages, setMessages] = useState([]);
   const [documents, setDocuments] = useState({
   prescription: null,
@@ -877,7 +879,7 @@ if (page === "medical-history") {
   onClick={async () => {
     try {
       const response = await API.post("/medical-history", {
-        patient_id: 1,
+        patient_id: patientId,
         previousConditions: previousConditions,
         currentMedicines: currentMedicines,
         allergies: allergies,
