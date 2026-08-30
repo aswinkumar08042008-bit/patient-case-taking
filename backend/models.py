@@ -39,3 +39,11 @@ class MedicalHistory(Base):
         "Patient",
         back_populates="medical_history"
     )
+class VoiceResponse(Base):
+    __tablename__ = "voice_responses"
+
+    response_id = Column(Integer, primary_key=True, index=True)
+    visit_id = Column(Integer, nullable=False)
+    question = Column(String, nullable=False)
+    response = Column(String, nullable=False)
+    language = Column(String, nullable=True)

@@ -4,7 +4,8 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from database import Base, engine, SessionLocal
-from models import Patient,MedicalHistory
+from models import Patient, MedicalHistory
+from voice_case import start_voice_case
 
 
 app = FastAPI(title="MediVoice API")
@@ -33,6 +34,7 @@ def get_db():
         db.close()
 
 
+# Home
 @app.get("/")
 def home():
     return {
@@ -40,6 +42,7 @@ def home():
     }
 
 
+# Health check
 @app.get("/health")
 def health():
     return {
@@ -47,19 +50,17 @@ def health():
     }
 
 
+# -------------------------
+# Patient
+# -------------------------
+
 class PatientDetails(BaseModel):
     fullName: str
     age: int
     gender: str
     phoneNumber: str
-class MedicalHistoryDetails(BaseModel):
-    patient_id: int
-    previousConditions: str = ""
-    currentMedicines: str = ""
-    allergies: str = ""
-    previousSurgeries: str = ""
 
-# Create patient
+
 @app.post("/patients")
 def create_patient(
     patient: PatientDetails,
@@ -86,6 +87,37 @@ def create_patient(
             "phoneNumber": new_patient.phoneNumber
         }
     }
+
+
+# Get all patients
+@app.get("/patients")
+def get_patients(db: Session = Depends(get_db)):
+    patients = db.query(Patient).all()
+
+    return [
+        {
+            "id": patient.id,
+            "fullName": patient.fullName,
+            "age": patient.age,
+            "gender": patient.gender,
+            "phoneNumber": patient.phoneNumber
+        }
+        for patient in patients
+    ]
+
+
+# -------------------------
+# Medical History
+# -------------------------
+
+class MedicalHistoryDetails(BaseModel):
+    patient_id: int
+    previousConditions: str = ""
+    currentMedicines: str = ""
+    allergies: str = ""
+    previousSurgeries: str = ""
+
+
 @app.post("/medical-history")
 def create_medical_history(
     history: MedicalHistoryDetails,
@@ -114,26 +146,9 @@ def create_medical_history(
             "previousSurgeries": new_history.previousSurgeries
         }
     }
-@app.get("/patients")
-def get_patients(db: Session = Depends(get_db)):
-    patients = db.query(Patient).all()
 
-    return patients
-# Get all patients
-@app.get("/patients")
-def get_patients(db: Session = Depends(get_db)):
-    patients = db.query(Patient).all()
 
-    return [
-        {
-            "id": patient.id,
-            "fullName": patient.fullName,
-            "age": patient.age,
-            "gender": patient.gender,
-            "phoneNumber": patient.phoneNumber
-        }
-        for patient in patients
-    ]
+# Get medical history for one patient
 @app.get("/patients/{patient_id}/history")
 def get_patient_history(
     patient_id: int,
@@ -154,23 +169,12 @@ def get_patient_history(
         "allergies": history.allergies,
         "previousSurgeries": history.previousSurgeries
     }
-@app.get("/patients/{patient_id}/history")
-def get_medical_history(
-    patient_id: int,
-    db: Session = Depends(get_db)
-):
-    history = db.query(MedicalHistory).filter(
-        MedicalHistory.patient_id == patient_id
-    ).first()
 
-    if not history:
-        return {
-            "message": "No medical history found"
-        }
 
-    return {
-        "previousConditions": history.previousConditions,
-        "currentMedicines": history.currentMedicines,
-        "allergies": history.allergies,
-        "previousSurgeries": history.previousSurgeries
-    }
+# -------------------------
+# Voice Case
+# -------------------------
+
+@app.post("/start-voice-case/{visit_id}")
+def start_voice(visit_id: int):
+    return start_voice_case(visit_id)
