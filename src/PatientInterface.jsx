@@ -873,12 +873,29 @@ if (page === "medical-history") {
           </div>
 
           <button
-            className="continue-btn history-continue"
-           onClick={() => setPage("documents")}
-          >
-            {t.continue}
-            <ArrowRight size={20} />
-          </button>
+  className="continue-btn history-continue"
+  onClick={async () => {
+    try {
+      const response = await API.post("/medical-history", {
+        patient_id: 1,
+        previousConditions: previousConditions,
+        currentMedicines: currentMedicines,
+        allergies: allergies,
+        previousSurgeries: previousSurgeries,
+      });
+
+      console.log("Medical history saved:", response.data);
+
+      setPage("documents");
+    } catch (error) {
+      console.error("Failed to save medical history:", error);
+      alert("Could not save medical history.");
+    }
+  }}
+>
+  {t.continue}
+  <ArrowRight size={20} />
+</button>
         </div>
       </main>
     </div>

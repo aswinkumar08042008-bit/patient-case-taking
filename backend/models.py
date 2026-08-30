@@ -1,0 +1,25 @@
+from sqlalchemy import Column, Integer, String, ForeignKey
+from database import Base
+
+
+class Patient(Base):
+    __tablename__ = "patients"
+
+    id = Column(Integer, primary_key=True, index=True)
+    fullName = Column(String, nullable=False)
+    age = Column(Integer, nullable=False)
+    gender = Column(String, nullable=False)
+    phoneNumber = Column(String, nullable=False)
+
+
+class MedicalHistory(Base):
+    __tablename__ = "medical_history"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    patient_id = Column(Integer, ForeignKey("patients.id"), nullable=False)
+
+    previousConditions = Column(String, nullable=True)
+    currentMedicines = Column(String, nullable=True)
+    allergies = Column(String, nullable=True)
+    previousSurgeries = Column(String, nullable=True)
