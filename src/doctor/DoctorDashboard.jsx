@@ -1,5 +1,6 @@
 
-import { useState } from "react";
+import { useState,useEffect } from "react";
+import API from "../api/api";
 import {
   Search,
   Bell,
@@ -9,36 +10,39 @@ import {
   ArrowLeft,
 } from "lucide-react";
 import "./DoctorDashboard.css";
+
 function DoctorDashboard() {
   const [selectedPatient, setSelectedPatient] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const patients = [
-    {
-      id: "P001",
-      name: "Patient 01",
-      age: 45,
-      complaint: "Chest discomfort",
-      status: "New",
-    },
-    {
-      id: "P002",
-      name: "Patient 02",
-      age: 32,
-      complaint: "Persistent headache",
-      status: "Reviewed",
-    },
-    {
-      id: "P003",
-      name: "Patient 03",
-      age: 27,
-      complaint: "Fever and cough",
-      status: "New",
-    },
-  ];
+  const [patients, setPatients] = useState([]);
+const [loading, setLoading] = useState(true);
+const [medicalHistory, setMedicalHistory] = useState(null);
+useEffect(() => {
+  API.get("/patients")
+    .then((response) => {
+      console.log("Patients received:", response.data);
+      setPatients(response.data);
+      setLoading(false);
+    })
+    .catch((error) => {
+      console.error("Failed to fetch patients:", error);
+      setLoading(false);
+    });
+}, []);
+
+const fetchMedicalHistory = async (patientId) => {
+  try {
+    const response = await API.get(`/patients/${patientId}/history`);
+    console.log("Medical history:", response.data);
+    setMedicalHistory(response.data);
+  } catch (error) {
+    console.error("Failed to fetch medical history:", error);
+    setMedicalHistory(null);
+  }
+};
   const filteredPatients = patients.filter((patient) =>
-  patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  patient.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-  patient.complaint.toLowerCase().includes(searchTerm.toLowerCase())
+  patient.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  patient.id.toString().includes(searchTerm)
 );
 if (selectedPatient) {
   return (
@@ -72,12 +76,34 @@ if (selectedPatient) {
       </div>
 
       <div className="case-card">
-        <h2>Medical History</h2>
-        <p>
-          Previous medical conditions, medicines, allergies and
-          surgeries will appear here.
-        </p>
-      </div>
+  <h2>Medical History</h2>
+
+  {medicalHistory && !medicalHistory.message ? (
+    <>
+      <p>
+        <strong>Previous Conditions:</strong>{" "}
+        {medicalHistory.previousConditions || "None"}
+      </p>
+
+      <p>
+        <strong>Current Medicines:</strong>{" "}
+        {medicalHistory.currentMedicines || "None"}
+      </p>
+
+      <p>
+        <strong>Allergies:</strong>{" "}
+        {medicalHistory.allergies || "None"}
+      </p>
+
+      <p>
+        <strong>Previous Surgeries:</strong>{" "}
+        {medicalHistory.previousSurgeries || "None"}
+      </p>
+    </>
+  ) : (
+    <p>No medical history found.</p>
+  )}
+</div>
 
       <div className="case-card">
         <h2>Medical Documents</h2>
@@ -168,25 +194,24 @@ if (selectedPatient) {
 
 {filteredPatients.map((patient) => (            <div className="patient-row" key={patient.id}>
               <div>
-                <strong>{patient.name}</strong>
-                <small>{patient.id}</small>
+                <strong>{patient.fullName}</strong>
+                <small>Patient ID: {patient.id}</small>
               </div>
 
               <span>{patient.age}</span>
 
-              <span>{patient.complaint}</span>
+              <span>Patient details available</span>
 
-              <span
-                className={`status ${
-                  patient.status === "New" ? "status-new" : "status-reviewed"
-                }`}
-              >
-                {patient.status}
-              </span>
+              <span className="status status-new">
+  New
+</span>
 
              <button
   className="view-btn"
-  onClick={() => setSelectedPatient(patient)}
+onClick={() => {
+  setSelectedPatient(patient);
+  fetchMedicalHistory(patient.id);
+}}
 >
   View Case
 </button>

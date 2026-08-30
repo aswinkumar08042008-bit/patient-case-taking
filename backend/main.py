@@ -114,3 +114,63 @@ def create_medical_history(
             "previousSurgeries": new_history.previousSurgeries
         }
     }
+@app.get("/patients")
+def get_patients(db: Session = Depends(get_db)):
+    patients = db.query(Patient).all()
+
+    return patients
+# Get all patients
+@app.get("/patients")
+def get_patients(db: Session = Depends(get_db)):
+    patients = db.query(Patient).all()
+
+    return [
+        {
+            "id": patient.id,
+            "fullName": patient.fullName,
+            "age": patient.age,
+            "gender": patient.gender,
+            "phoneNumber": patient.phoneNumber
+        }
+        for patient in patients
+    ]
+@app.get("/patients/{patient_id}/history")
+def get_patient_history(
+    patient_id: int,
+    db: Session = Depends(get_db)
+):
+    history = db.query(MedicalHistory).filter(
+        MedicalHistory.patient_id == patient_id
+    ).first()
+
+    if not history:
+        return {
+            "message": "No medical history found"
+        }
+
+    return {
+        "previousConditions": history.previousConditions,
+        "currentMedicines": history.currentMedicines,
+        "allergies": history.allergies,
+        "previousSurgeries": history.previousSurgeries
+    }
+@app.get("/patients/{patient_id}/history")
+def get_medical_history(
+    patient_id: int,
+    db: Session = Depends(get_db)
+):
+    history = db.query(MedicalHistory).filter(
+        MedicalHistory.patient_id == patient_id
+    ).first()
+
+    if not history:
+        return {
+            "message": "No medical history found"
+        }
+
+    return {
+        "previousConditions": history.previousConditions,
+        "currentMedicines": history.currentMedicines,
+        "allergies": history.allergies,
+        "previousSurgeries": history.previousSurgeries
+    }

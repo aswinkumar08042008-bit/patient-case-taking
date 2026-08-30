@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 from database import Base
 
 
@@ -11,15 +12,30 @@ class Patient(Base):
     gender = Column(String, nullable=False)
     phoneNumber = Column(String, nullable=False)
 
+    medical_history = relationship(
+        "MedicalHistory",
+        back_populates="patient",
+        uselist=False
+    )
+
 
 class MedicalHistory(Base):
     __tablename__ = "medical_history"
 
     id = Column(Integer, primary_key=True, index=True)
 
-    patient_id = Column(Integer, ForeignKey("patients.id"), nullable=False)
+    patient_id = Column(
+        Integer,
+        ForeignKey("patients.id"),
+        nullable=False
+    )
 
     previousConditions = Column(String, nullable=True)
     currentMedicines = Column(String, nullable=True)
     allergies = Column(String, nullable=True)
     previousSurgeries = Column(String, nullable=True)
+
+    patient = relationship(
+        "Patient",
+        back_populates="medical_history"
+    )
