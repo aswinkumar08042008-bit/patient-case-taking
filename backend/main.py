@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 
 app = FastAPI(title="MediVoice API")
 
-# Allow React frontend to communicate with FastAPI
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173"],
@@ -24,4 +24,19 @@ def home():
 def health():
     return {
         "status": "healthy"
+    }
+
+
+class PatientDetails(BaseModel):
+    fullName: str
+    age: int
+    gender: str
+    phoneNumber: str
+
+
+@app.post("/patients")
+def create_patient(patient: PatientDetails):
+    return {
+        "message": "Patient details received",
+        "patient": patient
     }
