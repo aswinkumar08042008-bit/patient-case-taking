@@ -17,6 +17,17 @@ app.get("/", (req, res) => {
     message: "MediVoice API is connected!",
   });
 });
+app.post("/api/chat", (req, res) => {
+  const { message, language } = req.body;
+
+  console.log("Patient message:", message);
+  console.log("Language:", language);
+
+  res.json({
+    success: true,
+    reply: `I received your message: ${message}`,
+  });
+});
 });
 
 const PORT = process.env.PORT || 5000;
