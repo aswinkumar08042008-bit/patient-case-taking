@@ -1,4 +1,6 @@
 from fastapi import FastAPI, Depends
+from voice_case import start_voice_case
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -114,3 +116,12 @@ def create_medical_history(
             "previousSurgeries": new_history.previousSurgeries
         }
     }
+        "message": "Patient details received",
+        "patient": patient
+    }
+
+
+@app.post("/start-voice-case/{visit_id}")
+def start_voice(visit_id: int):
+    return start_voice_case_endpoint(visit_id : int):
+    return start_voice_case(visit_id)
