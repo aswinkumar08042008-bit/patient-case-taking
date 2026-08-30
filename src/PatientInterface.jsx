@@ -742,11 +742,13 @@ if (page === "case-taking") {
   </button>
 )}
         <div className="chat-input-area">
+          
           <input
             type="text"
             placeholder={t.typeAnswer}
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
+            disabled={caseCompleted}
             onKeyDown={(e) => {
               if (e.key === "Enter") handleSend();
             }}
@@ -760,9 +762,10 @@ if (page === "case-taking") {
   <Mic size={21} />
 </button>
           <button
-            className="send-btn"
-            onClick={handleSend}
-          >
+  className="send-btn"
+  onClick={handleSend}
+  disabled={caseCompleted}
+>
             <Send size={20} />
           </button>
         </div>
