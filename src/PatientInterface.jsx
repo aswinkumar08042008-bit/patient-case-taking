@@ -808,7 +808,9 @@ if (page === "medical-history") {
          <p>{t.medicalHistoryDesc}</p>
 
           <div className="form-group">
-            <label>{t.previousConditions}</label>
+            <label>
+  {t.previousConditions} <span className="optional-text">(Optional)</span>
+</label>
 
 <textarea
   placeholder={t.previousConditionsPlaceholder}
@@ -818,7 +820,7 @@ if (page === "medical-history") {
           </div>
 
           <div className="form-group">
-            <label>{t.currentMedicines}</label>
+            <label>{t.currentMedicines}<span className="optional-text">(Optional)</span></label>
 <textarea
   placeholder={t.currentMedicinesPlaceholder}
   value={currentMedicines}
@@ -827,7 +829,7 @@ if (page === "medical-history") {
           </div>
 
           <div className="form-group">
-            <label>{t.allergies}</label>
+            <label>{t.allergies}<span className="optional-text">(Optional)</span></label>
 <textarea
   placeholder={t.allergiesPlaceholder}
   value={allergies}
@@ -836,7 +838,7 @@ if (page === "medical-history") {
           </div>
 
           <div className="form-group">
-            <label>{t.previousSurgeries}</label>
+            <label>{t.previousSurgeries}<span className="optional-text">(Optional)</span></label>
 <textarea
   placeholder={t.surgeriesPlaceholder}
   value={previousSurgeries}
