@@ -1095,6 +1095,8 @@ if (page === "details") {
               <label>{t.age}</label>
               <input
   type="number"
+  min="1"
+  max="120"
   placeholder={t.enterAge}
   value={patientDetails.age}
   onChange={(e) =>
@@ -1127,14 +1129,15 @@ if (page === "details") {
 
           <div className="form-group">
             <label>{t.phoneNumber}</label>
-           <input
+          <input
   type="tel"
   placeholder={t.enterPhone}
   value={patientDetails.phoneNumber}
+  maxLength="10"
   onChange={(e) =>
     setPatientDetails({
       ...patientDetails,
-      phoneNumber: e.target.value,
+      phoneNumber: e.target.value.replace(/\D/g, ""),
     })
   }
 />
@@ -1142,6 +1145,12 @@ if (page === "details") {
 
           <button
   className="continue-btn details-continue"
+  disabled={
+  !patientDetails.fullName.trim() ||
+  !patientDetails.age ||
+  !patientDetails.gender ||
+  patientDetails.phoneNumber.length !== 10
+}
   onClick={() => setPage("consent")}
 >
   {t.continue}
