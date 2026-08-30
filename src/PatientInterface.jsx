@@ -1148,6 +1148,12 @@ if (page === "details") {
   }
 />
           </div>
+          {patientDetails.phoneNumber.length > 0 &&
+  patientDetails.phoneNumber.length !== 10 && (
+    <p className="error-message">
+      Please enter a valid 10-digit phone number.
+    </p>
+)}
 
           <button
   className="continue-btn details-continue"
