@@ -1,5 +1,4 @@
 import { useState ,useRef,useEffect} from "react";
-import API from "./api/api";
 import {
   Stethoscope,
   ArrowRight,
@@ -17,32 +16,7 @@ import {
 import "./App.css";
 
 function PatientInterface() {
-  const savePatientDetails = async () => {
-  try {
-    const response = await API.post("/patients", {
-      fullName: patientDetails.fullName,
-      age: Number(patientDetails.age),
-      gender: patientDetails.gender,
-      phoneNumber: patientDetails.phoneNumber,
-    });
 
-    console.log("Patient saved:", response.data);
-
-    setPage("consent");
-  } catch (error) {
-    console.error("Failed to save patient:", error);
-    alert("Could not connect to the backend.");
-  }
-};
-useEffect(() => {
-  API.get("/")
-    .then((response) => {
-      console.log("Backend connected:", response.data);
-    })
-    .catch((error) => {
-      console.error("Backend connection failed:", error);
-    });
-}, []);
 
   const [page, setPage] = useState("welcome");
   const [selectedLanguage, setSelectedLanguage] = useState("");
@@ -627,38 +601,36 @@ const handleSend = () => {
 
   setAnswer("");
 
- const questions = [
-  t.question1,
-  t.question2,
-  t.question3,
-  t.question4,
-];
+  const questions = [
+    t.question1,
+    t.question2,
+    t.question3,
+    t.question4,
+  ];
 
-setTimeout(() => {
-  const nextQuestion = questions[questionStep];
+  setTimeout(() => {
+     if (questionStep < questions.length - 1) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "ai",
+          text: questions[questionStep + 1],
+        },
+      ]);
 
-  if (nextQuestion) {
-    setMessages((prev) => [
-      ...prev,
-      {
-        sender: "ai",
-        text: nextQuestion,
-      },
-    ]);
+      setQuestionStep((prev) => prev + 1);
+    } else {
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "ai",
+          text: t.caseCollected,
+        },
+      ]);
 
-    setQuestionStep((prev) => prev + 1);
-  } else {
-    setMessages((prev) => [
-      ...prev,
-      {
-        sender: "ai",
-        text: t.caseCollected,
-      },
-    ]);
-
-    setCaseCompleted(true);
-  }
-}, 500);
+      setCaseCompleted(true);
+    }
+  }, 500);
 };
 const handleVoiceInput = () => {
   const SpeechRecognition =
@@ -768,13 +740,11 @@ if (page === "case-taking") {
   </button>
 )}
         <div className="chat-input-area">
-          
           <input
             type="text"
             placeholder={t.typeAnswer}
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
-            disabled={caseCompleted}
             onKeyDown={(e) => {
               if (e.key === "Enter") handleSend();
             }}
@@ -788,10 +758,9 @@ if (page === "case-taking") {
   <Mic size={21} />
 </button>
           <button
-  className="send-btn"
-  onClick={handleSend}
-  disabled={caseCompleted}
->
+            className="send-btn"
+            onClick={handleSend}
+          >
             <Send size={20} />
           </button>
         </div>
@@ -834,9 +803,7 @@ if (page === "medical-history") {
          <p>{t.medicalHistoryDesc}</p>
 
           <div className="form-group">
-            <label>
-  {t.previousConditions} <span className="optional-text">(Optional)</span>
-</label>
+            <label>{t.previousConditions}</label>
 
 <textarea
   placeholder={t.previousConditionsPlaceholder}
@@ -846,7 +813,7 @@ if (page === "medical-history") {
           </div>
 
           <div className="form-group">
-            <label>{t.currentMedicines}<span className="optional-text">(Optional)</span></label>
+            <label>{t.currentMedicines}</label>
 <textarea
   placeholder={t.currentMedicinesPlaceholder}
   value={currentMedicines}
@@ -855,7 +822,7 @@ if (page === "medical-history") {
           </div>
 
           <div className="form-group">
-            <label>{t.allergies}<span className="optional-text">(Optional)</span></label>
+            <label>{t.allergies}</label>
 <textarea
   placeholder={t.allergiesPlaceholder}
   value={allergies}
@@ -864,7 +831,7 @@ if (page === "medical-history") {
           </div>
 
           <div className="form-group">
-            <label>{t.previousSurgeries}<span className="optional-text">(Optional)</span></label>
+            <label>{t.previousSurgeries}</label>
 <textarea
   placeholder={t.surgeriesPlaceholder}
   value={previousSurgeries}
@@ -925,11 +892,6 @@ if (page === "documents") {
     handleDocumentUpload("prescription", e.target.files[0])
   }
 />
-{documents.prescription && (
-  <p className="uploaded-file">
-    ✓ {documents.prescription.name}
-  </p>
-)}
             </div>
 
             <div className="upload-box">
@@ -943,11 +905,6 @@ if (page === "documents") {
     handleDocumentUpload("labReports", e.target.files[0])
   }
 />
-{documents.labReports && (
-  <p className="uploaded-file">
-    ✓ {documents.labReports.name}
-  </p>
-)}
             </div>
 
             <div className="upload-box">
@@ -961,11 +918,6 @@ if (page === "documents") {
     handleDocumentUpload("dischargeSummary", e.target.files[0])
   }
 />
-{documents.dischargeSummary && (
-  <p className="uploaded-file">
-    ✓ {documents.dischargeSummary.name}
-  </p>
-)}
             </div>
 
             <div className="upload-box">
@@ -979,11 +931,6 @@ if (page === "documents") {
     handleDocumentUpload("otherDocuments", e.target.files[0])
   }
 />
-{documents.otherDocuments && (
-  <p className="uploaded-file">
-    ✓ {documents.otherDocuments.name}
-  </p>
-)}
             </div>
 
           </div>
@@ -1044,10 +991,7 @@ if (page === "documents") {
 
             <button
               className="get-started-btn"
-              onClick={() => {
-  setAgreed(false);
-  setPage("language");
-}}
+              onClick={() => setPage("language")}
             >
               {t.getStarted}
               <ArrowRight size={20} />
@@ -1149,8 +1093,6 @@ if (page === "details") {
               <label>{t.age}</label>
               <input
   type="number"
-  min="1"
-  max="120"
   placeholder={t.enterAge}
   value={patientDetails.age}
   onChange={(e) =>
@@ -1183,35 +1125,22 @@ if (page === "details") {
 
           <div className="form-group">
             <label>{t.phoneNumber}</label>
-          <input
+           <input
   type="tel"
   placeholder={t.enterPhone}
   value={patientDetails.phoneNumber}
-  maxLength="10"
   onChange={(e) =>
     setPatientDetails({
       ...patientDetails,
-      phoneNumber: e.target.value.replace(/\D/g, ""),
+      phoneNumber: e.target.value,
     })
   }
 />
           </div>
-          {patientDetails.phoneNumber.length > 0 &&
-  patientDetails.phoneNumber.length !== 10 && (
-    <p className="error-message">
-      Please enter a valid 10-digit phone number.
-    </p>
-)}
 
           <button
   className="continue-btn details-continue"
-  disabled={
-  !patientDetails.fullName.trim() ||
-  !patientDetails.age ||
-  !patientDetails.gender ||
-  patientDetails.phoneNumber.length !== 10
-}
-  onClick={savePatientDetails}
+  onClick={() => setPage("consent")}
 >
   {t.continue}
   <ArrowRight size={20} />
@@ -1444,26 +1373,16 @@ if (page === "review") {
   <div className="summary-content">
     {messages
       .filter((message) => message.sender === "user")
-      .map((message, index) => {
-        const questions = [
-          t.firstQuestion,
-          t.question1,
-          t.question2,
-          t.question3,
-          t.question4,
-        ];
+      .map((message, index) => (
+        <p key={index}>
+          <strong>{index + 1}.</strong> {message.text}
+        </p>
+      ))}
 
-        return (
-          <div key={index} className="answer-item">
-            <p>
-              <strong>{questions[index]}</strong>
-            </p>
-            <p>{message.text}</p>
-          </div>
-        );
-      })}
+   
   </div>
 </div>
+
           <div className="summary-section">
             <h2>📋 {t.reviewMedicalHistory}</h2>
 
