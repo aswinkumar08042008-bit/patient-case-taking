@@ -1,4 +1,5 @@
 import { useState ,useRef,useEffect} from "react";
+import API from "./api/api";
 import {
   Stethoscope,
   ArrowRight,
@@ -16,7 +17,15 @@ import {
 import "./App.css";
 
 function PatientInterface() {
-
+useEffect(() => {
+  API.get("/")
+    .then((response) => {
+      console.log("Backend connected:", response.data);
+    })
+    .catch((error) => {
+      console.error("Backend connection failed:", error);
+    });
+}, []);
 
   const [page, setPage] = useState("welcome");
   const [selectedLanguage, setSelectedLanguage] = useState("");
