@@ -11,6 +11,12 @@ app.get("/", (req, res) => {
   res.json({
     message: "MediVoice backend is running!",
   });
+  app.get("/api/test", (req, res) => {
+  res.json({
+    success: true,
+    message: "MediVoice API is connected!",
+  });
+});
 });
 
 const PORT = process.env.PORT || 5000;
