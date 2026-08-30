@@ -1113,7 +1113,7 @@ if (page === "documents") {
                 </div>
               </div>
 
-              <button className="voice-btn">🎤 Tap to Speak</button>
+             
             </div>
           </div>
         </main>
