@@ -17,6 +17,23 @@ import {
 import "./App.css";
 
 function PatientInterface() {
+  const savePatientDetails = async () => {
+  try {
+    const response = await API.post("/patients", {
+      fullName: patientDetails.fullName,
+      age: Number(patientDetails.age),
+      gender: patientDetails.gender,
+      phoneNumber: patientDetails.phoneNumber,
+    });
+
+    console.log("Patient saved:", response.data);
+
+    setPage("consent");
+  } catch (error) {
+    console.error("Failed to save patient:", error);
+    alert("Could not connect to the backend.");
+  }
+};
 useEffect(() => {
   API.get("/")
     .then((response) => {
@@ -1194,7 +1211,7 @@ if (page === "details") {
   !patientDetails.gender ||
   patientDetails.phoneNumber.length !== 10
 }
-  onClick={() => setPage("consent")}
+  onClick={savePatientDetails}
 >
   {t.continue}
   <ArrowRight size={20} />
