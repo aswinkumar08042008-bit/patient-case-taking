@@ -993,7 +993,10 @@ if (page === "documents") {
 
             <button
               className="get-started-btn"
-              onClick={() => setPage("language")}
+              onClick={() => {
+  setAgreed(false);
+  setPage("language");
+}}
             >
               {t.getStarted}
               <ArrowRight size={20} />
