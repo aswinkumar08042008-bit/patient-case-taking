@@ -899,6 +899,11 @@ if (page === "documents") {
     handleDocumentUpload("prescription", e.target.files[0])
   }
 />
+{documents.prescription && (
+  <p className="uploaded-file">
+    ✓ {documents.prescription.name}
+  </p>
+)}
             </div>
 
             <div className="upload-box">
@@ -912,6 +917,11 @@ if (page === "documents") {
     handleDocumentUpload("labReports", e.target.files[0])
   }
 />
+{documents.labReports && (
+  <p className="uploaded-file">
+    ✓ {documents.labReports.name}
+  </p>
+)}
             </div>
 
             <div className="upload-box">
@@ -925,6 +935,11 @@ if (page === "documents") {
     handleDocumentUpload("dischargeSummary", e.target.files[0])
   }
 />
+{documents.dischargeSummary && (
+  <p className="uploaded-file">
+    ✓ {documents.dischargeSummary.name}
+  </p>
+)}
             </div>
 
             <div className="upload-box">
@@ -938,6 +953,11 @@ if (page === "documents") {
     handleDocumentUpload("otherDocuments", e.target.files[0])
   }
 />
+{documents.otherDocuments && (
+  <p className="uploaded-file">
+    ✓ {documents.otherDocuments.name}
+  </p>
+)}
             </div>
 
           </div>
@@ -1398,16 +1418,26 @@ if (page === "review") {
   <div className="summary-content">
     {messages
       .filter((message) => message.sender === "user")
-      .map((message, index) => (
-        <p key={index}>
-          <strong>{index + 1}.</strong> {message.text}
-        </p>
-      ))}
+      .map((message, index) => {
+        const questions = [
+          t.firstQuestion,
+          t.question1,
+          t.question2,
+          t.question3,
+          t.question4,
+        ];
 
-   
+        return (
+          <div key={index} className="answer-item">
+            <p>
+              <strong>{questions[index]}</strong>
+            </p>
+            <p>{message.text}</p>
+          </div>
+        );
+      })}
   </div>
 </div>
-
           <div className="summary-section">
             <h2>📋 {t.reviewMedicalHistory}</h2>
 
