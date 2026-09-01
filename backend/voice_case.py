@@ -229,7 +229,7 @@ def main(visit_id=None):
     # TEMPORARY TEST VISIT
     # --------------------------------------------------------
     if visit_id is None:
-         visit_id = int(input("\nEnter the visit ID: "))
+        visit_id = int(input("\nEnter the visit ID: "))
 
     print("\nVisit ID:", visit_id)
 
