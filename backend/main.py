@@ -4,7 +4,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from database import Base, engine, SessionLocal
-from models import Patient, MedicalHistory
+from models import Patient, MedicalHistory, DoctorNote
 from voice_case import start_voice_case
 
 
@@ -117,7 +117,9 @@ class MedicalHistoryDetails(BaseModel):
     allergies: str = ""
     previousSurgeries: str = ""
 
-
+class DoctorNoteDetails(BaseModel):
+    patient_id: int
+    note: str
 @app.post("/medical-history")
 def create_medical_history(
     history: MedicalHistoryDetails,
@@ -147,7 +149,27 @@ def create_medical_history(
         }
     }
 
+# Get doctor notes for a patient
+# Get doctor notes for a patient
+@app.get("/patients/{patient_id}/notes")
+def get_doctor_notes(
+    patient_id: int,
+    db: Session = Depends(get_db)
+):
+    notes = db.query(DoctorNote).filter(
+        DoctorNote.patient_id == patient_id
+    ).all()
 
+    return [
+        {
+            "id": note.id,
+            "patient_id": note.patient_id,
+            "note": note.note,
+            "created_at": note.created_at.isoformat() 
+                 if note.created_at else None
+        }
+        for note in notes
+    ]
 # Get medical history for one patient
 @app.get("/patients/{patient_id}/history")
 def get_patient_history(
@@ -178,3 +200,28 @@ def get_patient_history(
 @app.post("/start-voice-case/{visit_id}")
 def start_voice(visit_id: int):
     return start_voice_case(visit_id)
+# Save doctor note
+@app.post("/patients/{patient_id}/notes")
+def create_doctor_note(
+    patient_id: int,
+    note_data: DoctorNoteDetails,
+    db: Session = Depends(get_db)
+):
+    new_note = DoctorNote(
+        patient_id=patient_id,
+        note=note_data.note
+    )
+
+    db.add(new_note)
+    db.commit()
+    db.refresh(new_note)
+
+    return {
+        "message": "Doctor note saved successfully",
+        "note": {
+    "id": new_note.id,
+    "patient_id": new_note.patient_id,
+    "note": new_note.note,
+    "created_at": new_note.created_at.isoformat()
+}
+    }

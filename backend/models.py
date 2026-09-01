@@ -1,4 +1,6 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from datetime import datetime
+from zoneinfo import ZoneInfo
 from sqlalchemy.orm import relationship
 from database import Base
 
@@ -47,3 +49,20 @@ class VoiceResponse(Base):
     question = Column(String, nullable=False)
     response = Column(String, nullable=False)
     language = Column(String, nullable=True)
+class DoctorNote(Base):
+    __tablename__ = "doctor_notes"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    patient_id = Column(
+        Integer,
+        ForeignKey("patients.id"),
+        nullable=False
+    )
+
+    note = Column(String, nullable=False)
+
+    created_at = Column(
+    DateTime,
+    default=lambda: datetime.now(ZoneInfo("Asia/Kolkata"))
+)
