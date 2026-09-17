@@ -33,6 +33,7 @@ import {
 import "./App.css";
 
 function PatientInterface() {
+ 
   const [page, setPage] = useState("welcome");
   const [selectedLanguage, setSelectedLanguage] = useState("");
   const [agreed, setAgreed] = useState(false);
@@ -56,6 +57,7 @@ function PatientInterface() {
   });
 
   const [answer, setAnswer] = useState("");
+  const [recordedAudio, setRecordedAudio] = useState(null);
   const [isListening, setIsListening] = useState(false);
   const [questionStep, setQuestionStep] = useState(0);
   const [caseCompleted, setCaseCompleted] = useState(false);
@@ -68,7 +70,10 @@ function PatientInterface() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const messagesEndRef = useRef(null);
-
+const [isRecording, setIsRecording] = useState(false);
+const [conversation, setConversation] = useState("");
+const mediaRecorderRef = useRef(null);
+const audioChunksRef = useRef([]);
   const translations = {
     English: {
       getStarted: "Get Started",
@@ -253,7 +258,400 @@ function PatientInterface() {
       securePlatform:
         "Your healthcare information is securely managed.",
     },
+"हिन्दी": {
+  getStarted: "शुरू करें",
+  login: "लॉग इन",
+  continue: "जारी रखें",
+  back: "वापस",
 
+  chooseLanguage: "अपनी भाषा चुनें",
+  selectLanguage:
+    "अपना स्वास्थ्य मूल्यांकन जारी रखने के लिए अपनी पसंदीदा भाषा चुनें।",
+
+  patientDetails: "अपने बारे में बताएं",
+  patientDetailsDesc:
+    "स्वास्थ्य मूल्यांकन शुरू करने से पहले अपनी मूल जानकारी दें।",
+
+  fullName: "पूरा नाम",
+  enterFullName: "अपना पूरा नाम दर्ज करें",
+  age: "उम्र",
+  enterAge: "उम्र दर्ज करें",
+  gender: "लिंग",
+  selectGender: "चुनें",
+  male: "पुरुष",
+  female: "महिला",
+  preferNotToSay: "बताना नहीं चाहते",
+  phoneNumber: "फोन नंबर",
+  enterPhone: "अपना फोन नंबर दर्ज करें",
+
+  privacyTitle: "आपकी गोपनीयता महत्वपूर्ण है",
+  privacyDesc:
+    "स्वास्थ्य मूल्यांकन शुरू करने से पहले कृपया जानकारी पढ़ें और अपनी सहमति दें।",
+  agreeContinue: "सहमत होकर जारी रखें",
+
+  medicalHistory: "चिकित्सा इतिहास",
+  uploadDocuments: "चिकित्सा दस्तावेज़ अपलोड करें",
+  skipForNow: "अभी छोड़ें",
+
+  review: "अपनी स्वास्थ्य जानकारी की समीक्षा करें",
+  submitCase: "केस जमा करें",
+  caseSubmitted: "केस सफलतापूर्वक जमा किया गया!",
+
+  aiAssistantOnline: "AI सहायक ऑनलाइन है",
+  exit: "बाहर निकलें",
+  send: "भेजें",
+
+  aiGreeting:
+    "नमस्ते! मैं MediVoice, आपका AI स्वास्थ्य सहायक हूँ।",
+
+  firstQuestion:
+    "आज आपको अस्पताल आने की क्या समस्या हुई?",
+  question1:
+    "यह समस्या कब शुरू हुई?",
+  question2:
+    "आप कैसा महसूस कर रहे हैं, क्या आप बता सकते हैं?",
+  question3:
+    "क्या आपको कोई अन्य लक्षण हैं?",
+  question4:
+    "क्या आपने इस समस्या के लिए कोई दवा ली है?",
+
+  caseCollected:
+    "धन्यवाद। मैंने प्रारंभिक जानकारी एकत्र कर ली है।",
+
+  continueMedicalHistory:
+    "चिकित्सा इतिहास पर जाएं",
+
+  medicalHistoryDesc:
+    "कृपया अपने पिछले स्वास्थ्य संबंधी जानकारी दें।",
+
+  previousConditions: "पिछली चिकित्सा समस्याएं",
+  previousConditionsPlaceholder:
+    "उदाहरण: मधुमेह, अस्थमा, रक्तचाप या कुछ नहीं है तो खाली छोड़ दें",
+
+  currentMedicines: "वर्तमान दवाएं",
+  currentMedicinesPlaceholder:
+    "आप वर्तमान में ले रहे दवाओं को दर्ज करें या कुछ नहीं है तो खाली छोड़ दें",
+
+  allergies: "एलर्जी",
+  allergiesPlaceholder:
+    "ज्ञात एलर्जी दर्ज करें या कुछ नहीं है तो खाली छोड़ दें",
+
+  previousSurgeries:
+    "पिछली सर्जरी या अस्पताल में भर्ती",
+  surgeriesPlaceholder:
+    "विवरण दर्ज करें या कुछ नहीं है तो खाली छोड़ दें",
+
+  uploadDocumentsTitle:
+    "चिकित्सा दस्तावेज़ अपलोड करें",
+
+  uploadDocumentsDesc:
+    "आप ऐसे चिकित्सा दस्तावेज़ अपलोड कर सकते हैं जो आपके डॉक्टर को आपके स्वास्थ्य इतिहास को समझने में मदद कर सकते हैं।",
+
+  prescription: "प्रिस्क्रिप्शन",
+  prescriptionDesc:
+    "पिछले प्रिस्क्रिप्शन अपलोड करें",
+
+  labReports: "लैब रिपोर्ट",
+  labReportsDesc:
+    "ब्लड टेस्ट, स्कैन या अन्य रिपोर्ट",
+
+  dischargeSummary: "डिस्चार्ज सारांश",
+  dischargeSummaryDesc:
+    "पिछले अस्पताल के रिकॉर्ड अपलोड करें",
+
+  otherDocuments: "अन्य दस्तावेज़",
+  otherDocumentsDesc:
+    "अन्य संबंधित चिकित्सा दस्तावेज़",
+
+  uploadSkipText:
+    "यदि आपके पास कोई दस्तावेज़ नहीं है तो आप इस चरण को छोड़ सकते हैं।",
+
+  reviewTitle:
+    "अपनी स्वास्थ्य जानकारी की समीक्षा करें",
+
+  reviewDesc:
+    "अपना केस जमा करने से पहले एकत्र की गई जानकारी की समीक्षा करें।",
+
+  currentHealthConcern:
+    "वर्तमान स्वास्थ्य समस्या",
+
+  reviewMedicalHistory:
+    "चिकित्सा इतिहास",
+
+  medicalDocuments:
+    "चिकित्सा दस्तावेज़",
+
+  reviewNote:
+    "आपकी जानकारी डॉक्टर के लिए एक संरचित सारांश में व्यवस्थित की जाएगी।",
+
+  caseReady: "केस तैयार है",
+
+  caseReadyDesc:
+    "आपके केस का सारांश डॉक्टर के लिए तैयार है।",
+
+  secureInformation:
+    "सुरक्षित जानकारी",
+
+  secureInformationDesc:
+    "आपकी चिकित्सा जानकारी सुरक्षित रूप से संभाली जाती है।",
+
+  structuredSummary:
+    "संरचित सारांश",
+
+  structuredSummaryDesc:
+    "आपके उत्तर समीक्षा के लिए व्यवस्थित किए गए हैं।",
+
+  submittedDesc:
+    "आपकी स्वास्थ्य जानकारी एकत्र करके एक संरचित केस सारांश में व्यवस्थित की गई है।",
+
+  backToHome: "होम पर वापस जाएं",
+
+  chatDescription:
+    "मैं आपकी स्वास्थ्य समस्या को समझने में आपकी मदद करने के लिए यहां हूँ।",
+
+  typeAnswer: "अपना उत्तर लिखें...",
+  voiceInput: "वॉइस इनपुट",
+
+  casePrivacyNote:
+    "आपके उत्तरों का उपयोग केवल आपके मेडिकल केस सारांश को तैयार करने के लिए किया जाएगा।",
+
+  dashboard: "डैशबोर्ड",
+  caseTaking: "केस लेना",
+  history: "चिकित्सा इतिहास",
+  documents: "दस्तावेज़",
+  summary: "केस सारांश",
+  notifications: "सूचनाएं",
+  settings: "सेटिंग्स",
+  logout: "लॉग आउट",
+
+  welcomeBack: "वापसी पर स्वागत है",
+  patientDashboard:
+    "आपका व्यक्तिगत स्वास्थ्य डैशबोर्ड",
+
+  startAssessment:
+    "नया स्वास्थ्य मूल्यांकन शुरू करें",
+
+  startAssessmentDesc:
+    "MediVoice AI से बात करें और अपने डॉक्टर के लिए एक संरचित केस सारांश बनाएं।",
+
+  startNow: "मूल्यांकन शुरू करें",
+
+  healthOverview: "स्वास्थ्य अवलोकन",
+
+  activeCase: "सक्रिय केस",
+  medicalRecords: "चिकित्सा रिकॉर्ड",
+  completedCases: "पूर्ण किए गए केस",
+
+  quickActions: "त्वरित कार्य",
+  recentActivity: "हाल की गतिविधि",
+
+  securePlatform:
+    "आपकी स्वास्थ्य जानकारी सुरक्षित रूप से प्रबंधित की जाती है।",
+},
+"മലയാളം": {
+  getStarted: "തുടങ്ങുക",
+  login: "ലോഗിൻ",
+  continue: "തുടരുക",
+  back: "തിരികെ",
+
+  chooseLanguage: "നിങ്ങളുടെ ഭാഷ തിരഞ്ഞെടുക്കുക",
+  selectLanguage:
+    "ആരോഗ്യ പരിശോധന തുടരാൻ നിങ്ങളുടെ ഇഷ്ടപ്പെട്ട ഭാഷ തിരഞ്ഞെടുക്കുക.",
+
+  patientDetails: "നിങ്ങളെക്കുറിച്ച് പറയൂ",
+  patientDetailsDesc:
+    "ആരോഗ്യ പരിശോധന ആരംഭിക്കുന്നതിന് മുമ്പ് നിങ്ങളുടെ അടിസ്ഥാന വിവരങ്ങൾ നൽകുക.",
+
+  fullName: "പൂർണ്ണ പേര്",
+  enterFullName: "നിങ്ങളുടെ പൂർണ്ണ പേര് നൽകുക",
+  age: "പ്രായം",
+  enterAge: "പ്രായം നൽകുക",
+  gender: "ലിംഗം",
+  selectGender: "തിരഞ്ഞെടുക്കുക",
+  male: "പുരുഷൻ",
+  female: "സ്ത്രീ",
+  preferNotToSay: "പറയാൻ താൽപ്പര്യമില്ല",
+  phoneNumber: "ഫോൺ നമ്പർ",
+  enterPhone: "ഫോൺ നമ്പർ നൽകുക",
+
+  privacyTitle: "നിങ്ങളുടെ സ്വകാര്യത പ്രധാനമാണ്",
+  privacyDesc:
+    "ആരോഗ്യ പരിശോധന ആരംഭിക്കുന്നതിന് മുമ്പ് വിവരങ്ങൾ പരിശോധിച്ച് സമ്മതം നൽകുക.",
+  agreeContinue: "സമ്മതിച്ച് തുടരുക",
+
+  medicalHistory: "മെഡിക്കൽ ചരിത്രം",
+  uploadDocuments: "മെഡിക്കൽ രേഖകൾ അപ്‌ലോഡ് ചെയ്യുക",
+  skipForNow: "ഇപ്പോൾ ഒഴിവാക്കുക",
+
+  review: "നിങ്ങളുടെ ആരോഗ്യ വിവരങ്ങൾ പരിശോധിക്കുക",
+  submitCase: "കേസ് സമർപ്പിക്കുക",
+  caseSubmitted: "കേസ് വിജയകരമായി സമർപ്പിച്ചു!",
+
+  aiAssistantOnline: "AI അസിസ്റ്റന്റ് ഓൺലൈനിലാണ്",
+  exit: "പുറത്ത് പോകുക",
+  send: "അയയ്ക്കുക",
+
+  aiGreeting:
+    "നമസ്കാരം! ഞാൻ MediVoice, നിങ്ങളുടെ AI ആരോഗ്യ സഹായി.",
+
+  firstQuestion:
+    "ഇന്ന് നിങ്ങളെ ആശുപത്രിയിൽ എത്തിച്ച പ്രശ്നം എന്താണ്?",
+
+  question1:
+    "ഈ പ്രശ്നം എപ്പോൾ ആരംഭിച്ചു?",
+
+  question2:
+    "നിങ്ങൾക്ക് എങ്ങനെ തോന്നുന്നു എന്ന് വിവരിക്കാമോ?",
+
+  question3:
+    "നിങ്ങൾക്ക് മറ്റേതെങ്കിലും ലക്ഷണങ്ങളുണ്ടോ?",
+
+  question4:
+    "ഈ പ്രശ്നത്തിനായി എന്തെങ്കിലും മരുന്ന് കഴിച്ചിട്ടുണ്ടോ?",
+
+  caseCollected:
+    "നന്ദി. പ്രാഥമിക വിവരങ്ങൾ ഞാൻ ശേഖരിച്ചു.",
+
+  continueMedicalHistory:
+    "മെഡിക്കൽ ചരിത്രത്തിലേക്ക് തുടരുക",
+
+  medicalHistoryDesc:
+    "നിങ്ങൾക്ക് അറിയാവുന്ന മുൻകാല ആരോഗ്യ വിവരങ്ങൾ നൽകുക.",
+
+  previousConditions:
+    "മുൻകാല ആരോഗ്യ പ്രശ്നങ്ങൾ",
+
+  previousConditionsPlaceholder:
+    "ഉദാഹരണം: പ്രമേഹം, ആസ്ത്മ, രക്തസമ്മർദ്ദം അല്ലെങ്കിൽ ഒന്നുമില്ലെങ്കിൽ ശൂന്യമായി വിടുക",
+
+  currentMedicines:
+    "നിലവിൽ കഴിക്കുന്ന മരുന്നുകൾ",
+
+  currentMedicinesPlaceholder:
+    "നിലവിൽ കഴിക്കുന്ന മരുന്നുകൾ നൽകുക അല്ലെങ്കിൽ ഒന്നുമില്ലെങ്കിൽ ശൂന്യമായി വിടുക",
+
+  allergies: "അലർജികൾ",
+
+  allergiesPlaceholder:
+    "അറിയാവുന്ന അലർജികൾ നൽകുക അല്ലെങ്കിൽ ഒന്നുമില്ലെങ്കിൽ ശൂന്യമായി വിടുക",
+
+  previousSurgeries:
+    "മുൻകാല ശസ്ത്രക്രിയകൾ അല്ലെങ്കിൽ ആശുപത്രി പ്രവേശനങ്ങൾ",
+
+  surgeriesPlaceholder:
+    "വിശദാംശങ്ങൾ നൽകുക അല്ലെങ്കിൽ ഒന്നുമില്ലെങ്കിൽ ശൂന്യമായി വിടുക",
+
+  uploadDocumentsTitle:
+    "മെഡിക്കൽ രേഖകൾ അപ്‌ലോഡ് ചെയ്യുക",
+
+  uploadDocumentsDesc:
+    "നിങ്ങളുടെ ആരോഗ്യ ചരിത്രം മനസ്സിലാക്കാൻ ഡോക്ടറെ സഹായിക്കുന്ന മെഡിക്കൽ രേഖകൾ അപ്‌ലോഡ് ചെയ്യാം.",
+
+  prescription: "പ്രിസ്ക്രിപ്ഷൻ",
+  prescriptionDesc:
+    "മുൻകാല പ്രിസ്ക്രിപ്ഷനുകൾ അപ്‌ലോഡ് ചെയ്യുക",
+
+  labReports: "ലാബ് റിപ്പോർട്ടുകൾ",
+  labReportsDesc:
+    "രക്ത പരിശോധന, സ്കാൻ അല്ലെങ്കിൽ മറ്റ് റിപ്പോർട്ടുകൾ",
+
+  dischargeSummary: "ഡിസ്ചാർജ് സംഗ്രഹം",
+  dischargeSummaryDesc:
+    "മുൻകാല ആശുപത്രി രേഖകൾ അപ്‌ലോഡ് ചെയ്യുക",
+
+  otherDocuments: "മറ്റ് രേഖകൾ",
+  otherDocumentsDesc:
+    "മറ്റ് ബന്ധപ്പെട്ട മെഡിക്കൽ രേഖകൾ",
+
+  uploadSkipText:
+    "രേഖകൾ ഇല്ലെങ്കിൽ ഈ ഘട്ടം ഒഴിവാക്കാം.",
+
+  reviewTitle:
+    "നിങ്ങളുടെ ആരോഗ്യ വിവരങ്ങൾ പരിശോധിക്കുക",
+
+  reviewDesc:
+    "കേസ് സമർപ്പിക്കുന്നതിന് മുമ്പ് ശേഖരിച്ച വിവരങ്ങൾ പരിശോധിക്കുക.",
+
+  currentHealthConcern:
+    "നിലവിലെ ആരോഗ്യ പ്രശ്നം",
+
+  reviewMedicalHistory:
+    "മെഡിക്കൽ ചരിത്രം",
+
+  medicalDocuments:
+    "മെഡിക്കൽ രേഖകൾ",
+
+  reviewNote:
+    "നിങ്ങളുടെ വിവരങ്ങൾ ഡോക്ടർക്കായി ഒരു ഘടനാപരമായ സംഗ്രഹമായി ക്രമീകരിക്കും.",
+
+  caseReady: "കേസ് തയ്യാറാണ്",
+
+  caseReadyDesc:
+    "നിങ്ങളുടെ കേസ് സംഗ്രഹം ഡോക്ടർക്കായി തയ്യാറാണ്.",
+
+  secureInformation:
+    "സുരക്ഷിതമായ വിവരങ്ങൾ",
+
+  secureInformationDesc:
+    "നിങ്ങളുടെ മെഡിക്കൽ വിവരങ്ങൾ സുരക്ഷിതമായി കൈകാര്യം ചെയ്യുന്നു.",
+
+  structuredSummary:
+    "ഘടനാപരമായ സംഗ്രഹം",
+
+  structuredSummaryDesc:
+    "നിങ്ങളുടെ ഉത്തരങ്ങൾ പരിശോധനയ്ക്കായി ക്രമീകരിച്ചിരിക്കുന്നു.",
+
+  submittedDesc:
+    "നിങ്ങളുടെ ആരോഗ്യ വിവരങ്ങൾ ശേഖരിച്ച് ഒരു ഘടനാപരമായ കേസ് സംഗ്രഹമായി ക്രമീകരിച്ചിരിക്കുന്നു.",
+
+  backToHome:
+    "ഹോമിലേക്ക് മടങ്ങുക",
+
+  chatDescription:
+    "നിങ്ങളുടെ ആരോഗ്യ പ്രശ്നം മനസ്സിലാക്കാൻ ഞാൻ ഇവിടെ ഉണ്ട്.",
+
+  typeAnswer:
+    "നിങ്ങളുടെ ഉത്തരം എഴുതുക...",
+
+  voiceInput: "വോയ്സ് ഇൻപുട്ട്",
+
+  casePrivacyNote:
+    "നിങ്ങളുടെ ഉത്തരങ്ങൾ മെഡിക്കൽ കേസ് സംഗ്രഹം തയ്യാറാക്കാൻ മാത്രം ഉപയോഗിക്കും.",
+
+  dashboard: "ഡാഷ്ബോർഡ്",
+  caseTaking: "കേസ് എടുക്കൽ",
+  history: "മെഡിക്കൽ ചരിത്രം",
+  documents: "രേഖകൾ",
+  summary: "കേസ് സംഗ്രഹം",
+  notifications: "അറിയിപ്പുകൾ",
+  settings: "ക്രമീകരണങ്ങൾ",
+  logout: "ലോഗൗട്ട്",
+
+  welcomeBack: "വീണ്ടും സ്വാഗതം",
+  patientDashboard:
+    "നിങ്ങളുടെ വ്യക്തിഗത ആരോഗ്യ ഡാഷ്ബോർഡ്",
+
+  startAssessment:
+    "പുതിയ ആരോഗ്യ പരിശോധന ആരംഭിക്കുക",
+
+  startAssessmentDesc:
+    "MediVoice AI-യുമായി സംസാരിച്ച് ഡോക്ടർക്കായി ഘടനാപരമായ കേസ് സംഗ്രഹം തയ്യാറാക്കുക.",
+
+  startNow: "പരിശോധന ആരംഭിക്കുക",
+
+  healthOverview:
+    "ആരോഗ്യ അവലോകനം",
+
+  activeCase: "നിലവിലെ കേസ്",
+  medicalRecords: "മെഡിക്കൽ രേഖകൾ",
+  completedCases: "പൂർത്തിയായ കേസുകൾ",
+
+  quickActions: "ദ്രുത പ്രവർത്തനങ്ങൾ",
+  recentActivity: "സമീപകാല പ്രവർത്തനങ്ങൾ",
+
+  securePlatform:
+    "നിങ്ങളുടെ ആരോഗ്യ വിവരങ്ങൾ സുരക്ഷിതമായി കൈകാര്യം ചെയ്യുന്നു.",
+},
     "தமிழ்": {
       getStarted: "தொடங்குங்கள்",
       login: "உள்நுழைக",
@@ -499,30 +897,25 @@ function PatientInterface() {
         console.error("Backend connection failed:", error);
       });
   }, []);
+useEffect(() => {
+  if (selectedLanguage) {
+    setMessages([
+      {
+        sender: "ai",
+        text: t.aiGreeting,
+      },
+    ]);
 
-  useEffect(() => {
-    if (selectedLanguage) {
-      setMessages([
-        {
-          sender: "ai",
-          text: t.aiGreeting,
-        },
-        {
-          sender: "ai",
-          text: t.firstQuestion,
-        },
-      ]);
+    setConversation(
+      `AI: ${t.aiGreeting}\n\n`
+    );
 
-      setQuestionStep(0);
-      setCaseCompleted(false);
-    }
-  }, [selectedLanguage]);
+    setQuestionStep(0);
+    setCaseCompleted(false);
+  }
+}, [selectedLanguage]);
 
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({
-      behavior: "smooth",
-    });
-  }, [messages]);
+
 
   const handleDocumentUpload = (type, file) => {
     if (!file) return;
@@ -532,12 +925,109 @@ function PatientInterface() {
       [type]: file,
     }));
   };
+const handleVoiceSend = async () => {
+  if (!answer.trim()) return;
 
-  const handleSend = () => {
-    if (!answer.trim()) return;
+  try {
+    const formData = new FormData();
 
-    const userAnswer = answer;
+formData.append("patient_answer", answer);
+formData.append("conversation", conversation);
 
+const response = await API.post(
+  "/voice/respond",
+  formData
+);
+
+    console.log("VOICE RESPONSE:", response.data);
+
+    if (!response.data.success) {
+      alert(
+        response.data.message ||
+        "Could not process your answer."
+      );
+      return;
+    }
+
+    // Show patient's answer
+    setMessages((prev) => [
+      ...prev,
+      {
+        sender: "user",
+        text: answer,
+      },
+    ]);
+
+    // Update conversation
+    setConversation(
+      response.data.conversation || ""
+    );
+
+    // Show next AI question
+    if (response.data.question) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "ai",
+          text: response.data.question,
+        },
+      ]);
+
+      const utterance =
+        new SpeechSynthesisUtterance(
+          response.data.question
+        );
+
+      utterance.lang = "en-IN";
+      utterance.rate = 0.9;
+      utterance.pitch = 1;
+
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+    }
+
+    // Clear text box
+    setAnswer("");
+    setRecordedAudio(null);
+
+  } catch (error) {
+    console.error(
+      "Voice API error:",
+      error
+    );
+
+    alert(
+      "Unable to connect to the AI voice service."
+    );
+  }
+};
+const handleSend = async () => {
+  if (!answer.trim()) return;
+
+  const userAnswer = answer;
+
+  try {
+    const formData = new FormData();
+
+    formData.append("patient_answer", userAnswer);
+    formData.append("conversation", conversation);
+
+    const response = await API.post(
+      "/voice/respond",
+      formData
+    );
+
+    console.log("TEXT RESPONSE:", response.data);
+
+    if (!response.data.success) {
+      alert(
+        response.data.message ||
+        "Could not process your answer."
+      );
+      return;
+    }
+
+    // Show patient's answer
     setMessages((prev) => [
       ...prev,
       {
@@ -546,90 +1036,231 @@ function PatientInterface() {
       },
     ]);
 
-    setAnswer("");
+    // Update conversation
+    setConversation(
+      response.data.conversation || ""
+    );
 
-    const questions = [
-      t.question1,
-      t.question2,
-      t.question3,
-      t.question4,
-    ];
+    // Increase question count
+    const nextStep = questionStep + 1;
+    setQuestionStep(nextStep);
 
-    setTimeout(() => {
-      const nextQuestion = questions[questionStep];
+    // If 12 questions are completed
+    if (nextStep >= 12) {
+      setCaseCompleted(true);
 
-      if (nextQuestion) {
-        setMessages((prev) => [
-          ...prev,
-          {
-            sender: "ai",
-            text: nextQuestion,
-          },
-        ]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "ai",
+          text: t.caseCollected,
+        },
+      ]);
 
-        setQuestionStep((prev) => prev + 1);
-      } else {
-        setMessages((prev) => [
-          ...prev,
-          {
-            sender: "ai",
-            text: t.caseCollected,
-          },
-        ]);
+      window.speechSynthesis.cancel();
 
-        setCaseCompleted(true);
-      }
-    }, 500);
-  };
-
-  const handleVoiceInput = () => {
-    const SpeechRecognition =
-      window.SpeechRecognition ||
-      window.webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-      alert(
-        "Speech recognition is not supported in this browser."
-      );
+      setAnswer("");
       return;
     }
 
-    const recognition = new SpeechRecognition();
+    // Show next AI question
+    if (response.data.question) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          sender: "ai",
+          text: response.data.question,
+        },
+      ]);
 
-    const languageCodes = {
-      "தமிழ்": "ta-IN",
-      English: "en-IN",
-      "हिन्दी": "hi-IN",
-      "മലയാളം": "ml-IN",
-    };
+      const utterance =
+        new SpeechSynthesisUtterance(
+          response.data.question
+        );
 
-    recognition.lang =
-      languageCodes[selectedLanguage] || "en-IN";
+      utterance.lang =
+        selectedLanguage === "தமிழ்"
+          ? "ta-IN"
+          : selectedLanguage === "हिन्दी"
+          ? "hi-IN"
+          : selectedLanguage === "മലയാളം"
+          ? "ml-IN"
+          : "en-IN";
 
-    recognition.interimResults = false;
-    recognition.continuous = false;
+      utterance.rate = 0.9;
+      utterance.pitch = 1;
 
-    recognition.onstart = () => {
-      setIsListening(true);
-    };
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+    }
 
-    recognition.onresult = (event) => {
-      const spokenText =
-        event.results[0][0].transcript;
+    setAnswer("");
 
-      setAnswer(spokenText);
-    };
+  } catch (error) {
+    console.error(
+      "Text API error:",
+      error
+    );
 
-    recognition.onerror = () => {
-      setIsListening(false);
-    };
+    alert(
+      "Unable to connect to the AI voice service."
+    );
+  }
+};
 
-    recognition.onend = () => {
-      setIsListening(false);
-    };
+const handleVoiceInput = () => {
+  const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
 
-    recognition.start();
+  if (!SpeechRecognition) {
+    alert(
+      "Speech recognition is not supported in this browser. Please use Google Chrome."
+    );
+    return;
+  }
+
+  if (isRecording) {
+    return;
+  }
+
+  const recognition = new SpeechRecognition();
+
+  recognition.lang =
+    selectedLanguage === "தமிழ்"
+      ? "ta-IN"
+      : selectedLanguage === "हिन्दी"
+      ? "hi-IN"
+      : selectedLanguage === "മലയാളം"
+      ? "ml-IN"
+      : "en-IN";
+
+  recognition.continuous = false;
+  recognition.interimResults = true;
+
+  recognition.onstart = () => {
+    console.log("Speech recognition started");
+    setIsRecording(true);
+    setIsListening(true);
   };
+
+  recognition.onresult = (event) => {
+    let transcript = "";
+
+    for (
+      let i = event.resultIndex;
+      i < event.results.length;
+      i++
+    ) {
+      transcript += event.results[i][0].transcript;
+    }
+
+    console.log("Transcript:", transcript);
+
+    setAnswer(transcript);
+  };
+
+  recognition.onerror = (event) => {
+    console.error(
+      "Speech recognition error:",
+      event.error
+    );
+
+    setIsRecording(false);
+    setIsListening(false);
+
+    if (event.error === "not-allowed") {
+      alert(
+        "Please allow microphone access in Chrome."
+      );
+    }
+  };
+
+  recognition.onend = () => {
+    console.log("Speech recognition ended");
+
+    setIsRecording(false);
+    setIsListening(false);
+  };
+
+  mediaRecorderRef.current = recognition;
+
+  recognition.start();
+};
+const stopVoiceInput = () => {
+  console.log("STOP BUTTON CLICKED");
+
+  const recognition = mediaRecorderRef.current;
+
+  if (recognition) {
+    recognition.stop();
+  }
+
+  setIsRecording(false);
+  setIsListening(false);
+};
+const startVoiceAI = async () => {
+  try {
+    const response = await API.post("/voice/start");
+
+    if (response.data.question) {
+      setConversation(
+        response.data.conversation || ""
+      );
+const nextStep = questionStep + 1;
+setQuestionStep(nextStep);
+
+if (nextStep >= 12) {
+  setCaseCompleted(true);
+
+  setMessages((prev) => [
+    ...prev,
+    {
+      sender: "ai",
+      text: t.caseCollected,
+    },
+  ]);
+
+  window.speechSynthesis.cancel();
+
+  setAnswer("");
+  setRecordedAudio(null);
+
+  return;
+}
+      // Put the AI's first question into your answer/question area
+      setMessages([
+  {
+    sender: "ai",
+    text: response.data.question,
+  },
+]);
+    }
+
+    // Play AI voice
+    if (response.data.question) {
+  const utterance = new SpeechSynthesisUtterance(
+    response.data.question
+  );
+
+  utterance.lang = "en-IN";
+  utterance.rate = 0.9;
+  utterance.pitch = 1;
+
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utterance);
+}
+  } catch (error) {
+    console.error(
+      "AI start error:",
+      error
+    );
+
+    alert(
+      "Unable to start the AI voice interview."
+    );
+  }
+};
 
   const goToPage = (targetPage) => {
     setPage(targetPage);
@@ -1178,19 +1809,27 @@ function PatientInterface() {
             <div ref={messagesEndRef} />
           </div>
 
-          {caseCompleted && (
-            <button
-              className="medical-history-btn"
-              onClick={() =>
-                goToPage(
-                  "medical-history"
-                )
-              }
-            >
-              {t.continueMedicalHistory}
-              <ArrowRight size={18} />
-            </button>
-          )}
+{caseCompleted && (
+  <div className="case-completed-box">
+    <CircleCheck size={40} />
+
+    <h2>Case Taking Completed</h2>
+
+    <p>
+      {t.caseCollected}
+    </p>
+
+    <button
+      className="medical-history-btn"
+      onClick={() =>
+        goToPage("medical-history")
+      }
+    >
+      {t.continueMedicalHistory}
+      <ArrowRight size={18} />
+    </button>
+  </div>
+)}
 
           <div className="chat-input-area">
             <input
@@ -1204,34 +1843,34 @@ function PatientInterface() {
               }
               disabled={caseCompleted}
               onKeyDown={(e) => {
-                if (
-                  e.key === "Enter"
-                ) {
-                  handleSend();
-                }
-              }}
+  if (e.key === "Enter") {
+    e.preventDefault();
+    handleSend();
+  }
+}}
             />
-
-            <button
-              className={`mic-btn ${
-                isListening
-                  ? "listening"
-                  : ""
-              }`}
-              title={
-                t.voiceInput
-              }
-              onClick={
-                handleVoiceInput
-              }
-              disabled={caseCompleted}
-            >
-              <Mic size={20} />
-            </button>
+<button
+  className={`mic-btn ${
+    isRecording ? "listening" : ""
+  }`}
+  title={
+    isRecording
+      ? "Stop recording"
+      : t.voiceInput
+  }
+  onClick={
+    isRecording
+      ? stopVoiceInput
+      : handleVoiceInput
+  }
+  disabled={caseCompleted}
+>
+  <Mic size={20} />
+</button>
 
             <button
               className="send-btn"
-              onClick={handleSend}
+             onClick={handleSend}
               disabled={
                 caseCompleted
               }

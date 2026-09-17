@@ -1,11 +1,17 @@
-from fastapi import FastAPI, Depends
+import base64
+from fastapi import FastAPI, Depends, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from database import Base, engine, SessionLocal
 from models import Patient, MedicalHistory, DoctorNote
-from voice_case import start_voice_case
+from voice import (
+    get_first_question,
+    process_patient_answer,
+    transcribe_audio,
+    text_to_speech,
+)
 
 
 app = FastAPI(title="MediVoice API")
@@ -152,6 +158,7 @@ def create_medical_history(
 # Get doctor notes for a patient
 # Get doctor notes for a patient
 @app.get("/patients/{patient_id}/notes")
+
 def get_doctor_notes(
     patient_id: int,
     db: Session = Depends(get_db)
@@ -170,6 +177,47 @@ def get_doctor_notes(
         }
         for note in notes
     ]
+# Save a doctor note for a patient
+@app.post("/patients/{patient_id}/notes")
+def create_doctor_note(
+    patient_id: int,
+    note_data: DoctorNoteDetails,
+    db: Session = Depends(get_db)
+):
+    # Check whether patient exists
+    patient = db.query(Patient).filter(
+        Patient.id == patient_id
+    ).first()
+
+    if not patient:
+        return {
+            "success": False,
+            "message": "Patient not found"
+        }
+
+    new_note = DoctorNote(
+        patient_id=patient_id,
+        note=note_data.note
+    )
+
+    db.add(new_note)
+    db.commit()
+    db.refresh(new_note)
+
+    return {
+        "success": True,
+        "message": "Doctor note saved successfully",
+        "note": {
+            "id": new_note.id,
+            "patient_id": new_note.patient_id,
+            "note": new_note.note,
+            "created_at": (
+                new_note.created_at.isoformat()
+                if new_note.created_at
+                else None
+            )
+        }
+    }
 # Get medical history for one patient
 @app.get("/patients/{patient_id}/history")
 def get_patient_history(
@@ -192,36 +240,107 @@ def get_patient_history(
         "previousSurgeries": history.previousSurgeries
     }
 
-
 # -------------------------
-# Voice Case
+# AI Voice Case Taking
 # -------------------------
 
-@app.post("/start-voice-case/{visit_id}")
-def start_voice(visit_id: int):
-    return start_voice_case(visit_id)
-# Save doctor note
-@app.post("/patients/{patient_id}/notes")
-def create_doctor_note(
-    patient_id: int,
-    note_data: DoctorNoteDetails,
-    db: Session = Depends(get_db)
-):
-    new_note = DoctorNote(
-        patient_id=patient_id,
-        note=note_data.note
-    )
+@app.post("/voice/start")
+def start_voice_case():
+    """
+    Start a new AI voice medical interview.
+    """
 
-    db.add(new_note)
-    db.commit()
-    db.refresh(new_note)
+    question = get_first_question()
+
+    audio = text_to_speech(question)
+
+    audio_base64 = None
+
+    if audio:
+        audio_base64 = base64.b64encode(audio).decode("utf-8")
+
+    conversation = f"AI: {question}\n\n"
 
     return {
-        "message": "Doctor note saved successfully",
-        "note": {
-    "id": new_note.id,
-    "patient_id": new_note.patient_id,
-    "note": new_note.note,
-    "created_at": new_note.created_at.isoformat()
-}
+        "question": question,
+        "audio": audio_base64,
+        "conversation": conversation,
+        "completed": False,
     }
+
+@app.post("/voice/transcribe")
+async def voice_transcribe(
+    audio: UploadFile = File(...)
+):
+    try:
+        audio_bytes = await audio.read()
+
+        mime_type = audio.content_type or "audio/webm"
+
+        transcript = transcribe_audio(
+            audio_bytes,
+            mime_type
+        )
+
+        if not transcript:
+            return {
+                "success": False,
+                "message": "Could not understand the patient's voice."
+            }
+
+        return {
+            "success": True,
+            "text": transcript
+        }
+
+    except Exception as e:
+        print(
+            "Transcription API error:",
+            type(e).__name__,
+            e
+        )
+
+        return {
+            "success": False,
+            "message": "Speech transcription failed."
+        }
+@app.post("/voice/respond")
+async def voice_respond(
+    patient_answer: str = Form(...),
+    conversation: str = Form("")
+):
+    try:
+        print("PATIENT ANSWER:", patient_answer)
+
+        if not patient_answer.strip():
+            return {
+                "success": False,
+                "message": "Patient answer is empty."
+            }
+
+        result = process_patient_answer(
+            conversation,
+            patient_answer
+        )
+
+        question = result["question"]
+
+        return {
+            "success": True,
+            "patient_answer": patient_answer,
+            "question": question,
+            "conversation": result["conversation"],
+            "completed": result["completed"],
+        }
+
+    except Exception as e:
+        print(
+            "Voice API error:",
+            type(e).__name__,
+            e
+        )
+
+        return {
+            "success": False,
+            "message": "Voice processing failed."
+        }

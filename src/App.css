@@ -890,12 +890,11 @@ button:disabled {
 ========================================================= */
 
 .chat-card {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 220px);
+  min-height: 0;
   overflow: hidden;
-
-  border: 1px solid #1d2d41;
-  border-radius: 14px;
-
-  background: #0c1727;
 }
 
 .chat-card-header {
@@ -980,11 +979,12 @@ button:disabled {
 }
 
 .messages {
-  height: 460px;
-
+  flex: 1;
   overflow-y: auto;
-
+  overflow-x: hidden;
   padding: 24px;
+  min-height: 0;
+  scroll-behavior: smooth;
 }
 
 .messages::-webkit-scrollbar {
@@ -1074,15 +1074,14 @@ button:disabled {
 }
 
 .chat-input-area {
+  flex-shrink: 0;
   display: flex;
-  gap: 8px;
-
-  padding: 15px 18px;
-
-  border-top: 1px solid #1c2b3e;
-  background: #0e1a29;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  background: inherit;
 }
-
 .chat-input-area input {
   flex: 1;
 
@@ -2530,9 +2529,10 @@ button:disabled {
   }
 
   .messages {
-    height: 400px;
-    padding: 17px;
-  }
+  flex: 1;
+  min-height: 0;
+  padding: 17px;
+}
 
   .message-bubble {
     max-width: 82%;
@@ -2543,8 +2543,9 @@ button:disabled {
   }
 
   .chat-input-area input {
-    width: 100%;
-  }
+  flex: 1;
+  min-width: 0;
+}
 
   .simple-navbar,
   .landing-navbar {
@@ -2576,5 +2577,43 @@ button:disabled {
     flex-direction: column;
     align-items: center;
     gap: 12px;
+  }
+}
+.chat-input-area {
+  flex-shrink: 0;
+}
+
+.chat-input-area input {
+  -webkit-appearance: none;
+  appearance: none;
+}
+@media (max-width: 550px) {
+  html,
+  body {
+    height: 100%;
+    overflow-x: hidden;
+  }
+
+  .patient-system {
+    min-height: 100dvh;
+  }
+
+  .patient-main {
+    min-height: 100dvh;
+  }
+
+  .patient-content {
+    padding-bottom: 20px;
+  }
+
+  .chat-card {
+    height: calc(100dvh - 120px);
+    min-height: 0;
+  }
+
+  .chat-input-area {
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
   }
 }
