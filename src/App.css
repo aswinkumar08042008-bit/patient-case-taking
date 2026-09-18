@@ -1275,12 +1275,37 @@ button:disabled {
 }
 
 .form-group textarea {
-  min-height: 105px;
-  padding: 12px;
+  width: 100%;
+  min-height: 120px;
+  padding: 12px 14px;
+
+  border: 1px solid #26384c;
+  border-radius: 9px;
+
+  outline: none;
+
+  background: #0a1523;
+  color: #dce6ef;
+
+  font-size: 12px;
+  line-height: 1.6;
 
   resize: vertical;
 
-  line-height: 1.6;
+  overflow-y: auto;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+.form-group textarea:focus {
+  border-color: #347eaf;
+  background: #0c1929;
+}
+
+.form-group textarea::placeholder {
+  color: #53657b;
 }
 
 .form-group input::placeholder,

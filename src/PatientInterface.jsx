@@ -73,6 +73,7 @@ function PatientInterface() {
 const [isRecording, setIsRecording] = useState(false);
 const [conversation, setConversation] = useState("");
 const mediaRecorderRef = useRef(null);
+const recognitionRef = useRef(null);
 const audioChunksRef = useRef([]);
   const translations = {
     English: {
@@ -1135,11 +1136,13 @@ const handleVoiceInput = () => {
       ? "ml-IN"
       : "en-IN";
 
-  recognition.continuous = false;
+  recognition.continuous = true;
   recognition.interimResults = true;
+  recognition.maxAlternatives = 1;
 
   recognition.onstart = () => {
     console.log("Speech recognition started");
+
     setIsRecording(true);
     setIsListening(true);
   };
@@ -1148,14 +1151,18 @@ const handleVoiceInput = () => {
     let transcript = "";
 
     for (
-      let i = event.resultIndex;
+      let i = 0;
       i < event.results.length;
       i++
     ) {
-      transcript += event.results[i][0].transcript;
+      transcript +=
+        event.results[i][0].transcript;
     }
 
-    console.log("Transcript:", transcript);
+    console.log(
+      "Live transcript:",
+      transcript
+    );
 
     setAnswer(transcript);
   };
@@ -1168,11 +1175,16 @@ const handleVoiceInput = () => {
 
     setIsRecording(false);
     setIsListening(false);
+    recognitionRef.current = null;
 
     if (event.error === "not-allowed") {
       alert(
         "Please allow microphone access in Chrome."
       );
+    }
+
+    if (event.error === "no-speech") {
+      console.log("No speech detected.");
     }
   };
 
@@ -1181,19 +1193,20 @@ const handleVoiceInput = () => {
 
     setIsRecording(false);
     setIsListening(false);
+    recognitionRef.current = null;
   };
 
-  mediaRecorderRef.current = recognition;
+  recognitionRef.current = recognition;
 
   recognition.start();
 };
+
 const stopVoiceInput = () => {
   console.log("STOP BUTTON CLICKED");
 
-  const recognition = mediaRecorderRef.current;
-
-  if (recognition) {
-    recognition.stop();
+  if (recognitionRef.current) {
+    recognitionRef.current.stop();
+    recognitionRef.current = null;
   }
 
   setIsRecording(false);
@@ -1207,27 +1220,7 @@ const startVoiceAI = async () => {
       setConversation(
         response.data.conversation || ""
       );
-const nextStep = questionStep + 1;
-setQuestionStep(nextStep);
 
-if (nextStep >= 12) {
-  setCaseCompleted(true);
-
-  setMessages((prev) => [
-    ...prev,
-    {
-      sender: "ai",
-      text: t.caseCollected,
-    },
-  ]);
-
-  window.speechSynthesis.cancel();
-
-  setAnswer("");
-  setRecordedAudio(null);
-
-  return;
-}
       // Put the AI's first question into your answer/question area
       setMessages([
   {
@@ -1243,7 +1236,14 @@ if (nextStep >= 12) {
     response.data.question
   );
 
-  utterance.lang = "en-IN";
+  utterance.lang =
+  selectedLanguage === "தமிழ்"
+    ? "ta-IN"
+    : selectedLanguage === "हिन्दी"
+    ? "hi-IN"
+    : selectedLanguage === "മലയാളം"
+    ? "ml-IN"
+    : "en-IN";
   utterance.rate = 0.9;
   utterance.pitch = 1;
 
